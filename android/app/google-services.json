@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "181516133490",
+    "project_id": "dormfinder-eae6b",
+    "storage_bucket": "dormfinder-eae6b.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:181516133490:android:f983fa4b31a07ebea84eeb",
+        "android_client_info": {
+          "package_name": "com.example.flutter_application_1"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAEaiSmiizuEz5bDKJ6qVVVfICTt6HsaMg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
