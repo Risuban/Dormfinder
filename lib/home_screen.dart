@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_application_1/saved_screen.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'saved_screen.dart';
-import 'property.dart';
 import 'profile_screen.dart';
 
 class HomeScreen extends StatelessWidget {
@@ -43,9 +42,6 @@ class HomeScreen extends StatelessWidget {
                 ),
               ],
             ),
-            const Expanded(
-              child: PropertyList(), // Use PropertyList to display properties
-            )
           ],
         ),
       ),
@@ -67,8 +63,8 @@ class _MyHomePageState extends State<MyHomePage> {
   final List<Widget> _pages = [
     // ignore: prefer_const_constructors
     HomeScreen(),
-    const SavedScreen(),
-    const ProfileScreen(),
+    ProfileScreen(),
+    SavedScreen(),
   ];
 
   @override
@@ -89,9 +85,9 @@ class _MyHomePageState extends State<MyHomePage> {
         destinations: const <Widget>[
           NavigationDestination(
               icon: Icon(Icons.home_rounded), label: 'Inicio'),
+          NavigationDestination(icon: Icon(Icons.person), label: 'Perfil'),
           NavigationDestination(
               icon: FaIcon(FontAwesomeIcons.heart), label: 'Guardados'),
-          NavigationDestination(icon: Icon(Icons.person), label: 'Perfil')
         ],
       ),
     );
