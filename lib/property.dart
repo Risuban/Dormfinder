@@ -5,47 +5,510 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 class Property {
   final String name;
-  final String info1;
-  final String info2;
+  final String image;
+  final Map<String, dynamic> location;
+  final DocumentReference owner;
   final int price;
-  final String imageUrl;
-  final String? distance; // Make distance nullable
-  final GeoPoint? geoPoint; // Make geoPoint nullable
+  final String type;
+  final Map<String, dynamic> distance;
+  final Map<String, dynamic> features;
+  final Map<String, dynamic> services;
+  final String timePeriod;
 
   Property({
     required this.name,
-    required this.info1,
-    required this.info2,
+    required this.image,
+    required this.location,
+    required this.owner,
     required this.price,
-    required this.imageUrl,
-    this.distance, // Use nullable types
-    this.geoPoint, // Use nullable types
+    required this.type,
+    required this.distance,
+    required this.features,
+    required this.services,
+    required this.timePeriod,
   });
 
   factory Property.fromMap(Map<String, dynamic> map) {
     return Property(
-      name: map['name'] ?? '', // Provide a default value if 'name' is missing
-      info1:
-          map['info1'] ?? '', // Provide a default value if 'info1' is missing
-      info2:
-          map['info2'] ?? '', // Provide a default value if 'info2' is missing
-      price: (map['price'] as num?)?.toInt() ??
-          0, // Provide a default value for price
-      imageUrl: map['imageUrl'] ??
-          '', // Provide a default value if 'imageUrl' is missing
-      distance: map['distance'], // Allow null for distance
-      geoPoint: map['geopoint'], // Allow null for geoPoint
+      name: map['name'] ?? '',
+      image: map['image'] ?? '',
+      location: map['location'] as Map<String, dynamic>,
+      owner: map['owner'], // Aquí asumimos que 'owner' es una DocumentReference
+      price: map['price'] ?? 0,
+      type: map['type'] ?? '',
+      distance: map['distance'] as Map<String, dynamic>,
+      features: map['features'] as Map<String, dynamic>,
+      services: map['services'] as Map<String, dynamic>,
+      timePeriod: map['time_period'] ?? '',
     );
+  }
+
+  // Método buildDetailWidget a ser implementado en las subclases
+  Widget buildDetailWidget() {
+    // Implementación por defecto o lanzar una excepción si se espera que las subclases lo implementen
+    throw UnimplementedError('buildDetailWidget debe ser implementado en subclases de Property.');
   }
 }
 
-class PropertyList extends StatelessWidget {
-  const PropertyList({super.key});
 
+
+class Roomie extends Property {
+  final List<String> rules;
+
+  Roomie({
+    required String name,
+    required String image,
+    required Map<String, dynamic> location,
+    required DocumentReference owner,
+    required int price,
+    required String type,
+    required Map<String, dynamic> distance,
+    required Map<String, dynamic> features,
+    required Map<String, dynamic> services,
+    required String timePeriod,
+    required this.rules,
+  }) : super(
+          name: name,
+          image: image,
+          location: location,
+          owner: owner,
+          price: price,
+          type: type,
+          distance: distance,
+          features: features,
+          services: services,
+          timePeriod: timePeriod,
+        );
+
+  factory Roomie.fromMap(Map<String, dynamic> map) {
+    return Roomie(
+      name: map['name'] ?? '',
+      image: map['image'] ?? '',
+      location: map['location'] as Map<String, dynamic>,
+      owner: map['owner'], // Aquí deberías manejar la conversión a la referencia del documento
+      price: map['price'] ?? 0,
+      type: map['type'] ?? '',
+      distance: map['distance'] as Map<String, dynamic>,
+      features: map['features'] as Map<String, dynamic>,
+      services: map['services'] as Map<String, dynamic>,
+      timePeriod: map['time_period'] ?? '',
+      rules: List<String>.from(map['rules'] ?? []),
+    );
+  }
+
+ @override
+Widget buildDetailWidget() {
+  LatLng initialCameraPosition = LatLng(
+    location['gps'].latitude, // Asumiendo que 'gps' es un objeto LatLng
+    location['gps'].longitude,
+  );
+
+  Set<Marker> markers = {
+    Marker(
+      markerId: const MarkerId('propertyLocation'),
+      position: initialCameraPosition,
+      infoWindow: const InfoWindow(title: 'Ubicación de la Propiedad'),
+    ),
+  };
+
+  return SingleChildScrollView(
+    child: Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          // CarouselSlider para las imágenes
+          CarouselSlider(
+            options: CarouselOptions(
+              aspectRatio: 2.0,
+              enlargeCenterPage: true,
+              enableInfiniteScroll: false,
+              initialPage: 0,
+              autoPlay: true,
+            ),
+            items: [
+              Image.network(
+                image.isNotEmpty ? image : 'web/assets/yoshi_waton.jpg',
+                fit: BoxFit.cover,
+                width: 1000.0,
+              ),
+            ],
+          ),
+          SizedBox(height: 10),
+          Text(
+            name,
+            style: const TextStyle(fontSize: 25.0, fontWeight: FontWeight.bold),
+          ),
+          SizedBox(height: 10),
+          // Sección de Precio
+          Text(
+            'Precio: \$${price.toStringAsFixed(0)}',
+            style: const TextStyle(fontSize: 18),
+          ),
+          const SizedBox(height: 10),
+
+          // Divisor
+          const Divider(),
+
+          // Sección de Descripción
+          Text(
+            'Descripción: ${location['description']}',
+            style: const TextStyle(fontSize: 16),
+          ),
+          const SizedBox(height: 10),
+
+          // Divisor
+          const Divider(),
+
+          // Sección de Tiempo a la universidad
+          Text(
+            'Tiempo a la universidad: ${distance['time']}',
+            style: const TextStyle(fontSize: 16),
+          ),
+          const SizedBox(height: 10),
+
+          // Divisor
+          const Divider(),
+
+          // Sección de Reglas
+          Text(
+            'Reglas:',
+            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+          ),
+          ...rules.map((rule) => Text('• $rule')).toList(),
+          const SizedBox(height: 10),
+
+          // Divisor
+          const Divider(),
+
+          // Sección de Servicios
+          Text(
+            'Servicios:',
+            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+          ),
+          Text('Transporte público: ${services['public_transport']}'),
+          Text('Áreas verdes: ${services['green_areas']}'),
+          // ...añade aquí más campos si son necesarios...
+          SizedBox(height: 20),
+          // Widget de Google Maps
+          SizedBox(
+            height: 200,
+            child: GoogleMap(
+              initialCameraPosition: CameraPosition(
+                target: initialCameraPosition,
+                zoom: 17,
+              ),
+              markers: markers,
+            ),
+          ),
+        ],
+      ),
+    ),
+  );
+}
+}
+
+class Pension extends Property {
+  final List<Map<String, dynamic>> availableRooms;
+
+  Pension({
+    required String name,
+    required String image,
+    required Map<String, dynamic> location,
+    required DocumentReference owner,
+    required int price,
+    required String type,
+    required Map<String, dynamic> distance,
+    required Map<String, dynamic> features,
+    required Map<String, dynamic> services,
+    required String timePeriod,
+    required this.availableRooms,
+  }) : super(
+          name: name,
+          image: image,
+          location: location,
+          owner: owner,
+          price: price,
+          type: type,
+          distance: distance,
+          features: features,
+          services: services,
+          timePeriod: timePeriod,
+        );
+
+  factory Pension.fromMap(Map<String, dynamic> map) {
+    return Pension(
+      name: map['name'] ?? '',
+      image: map['image'] ?? '',
+      location: map['location'] ?? {},
+      owner: map['owner'],
+      price: map['price'] ?? 0,
+      type: map['type'] ?? '',
+      distance: map['distance'] ?? {},
+      features: map['features'] ?? {},
+      services: map['services'] ?? {},
+      timePeriod: map['time_period'] ?? '',
+      availableRooms: List<Map<String, dynamic>>.from(map['available_rooms'] ?? []),
+    );
+  }
+
+@override
+Widget buildDetailWidget() {
+    LatLng initialCameraPosition = LatLng(
+    location['gps'].latitude, // Asumiendo que 'gps' es un objeto LatLng
+    location['gps'].longitude,
+  );
+
+  Set<Marker> markers = {
+    Marker(
+      markerId: const MarkerId('propertyLocation'),
+      position: initialCameraPosition,
+      infoWindow: const InfoWindow(title: 'Ubicación de la Propiedad'),
+    ),
+  };
+  return Padding(
+    padding: const EdgeInsets.all(16.0),
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Mostrar el nombre
+        Text(
+          name,
+          style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+        ),
+        const SizedBox(height: 10),
+  
+        // Mostrar la imagen
+        Image.network(
+          image,
+          fit: BoxFit.cover,
+          width: double.infinity,
+          height: 200.0,
+        ),
+        const SizedBox(height: 10),
+  
+        // Mostrar el precio
+        Text(
+          'Precio: \$${price.toStringAsFixed(0)}',
+          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+        ),
+        const SizedBox(height: 10),
+  
+        const Divider(),
+  
+        // Mostrar las características de las habitaciones disponibles
+        const Text(
+          'Habitaciones Disponibles:',
+          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+        ),
+        ...availableRooms.map((room) => Text('Habitación: ${room['square_meters']} m², Baño: ${room['bathrooms']}')),
+        const SizedBox(height: 10),
+  
+        const Divider(),
+  
+        // Mostrar la distancia a la universidad
+        Text(
+          'Distancia a la universidad: ${distance['time']}',
+          style: const TextStyle(fontSize: 16),
+        ),
+        const SizedBox(height: 10),
+  
+        const Divider(),
+  
+        // Mostrar servicios
+        const Text(
+          'Servicios:',
+          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+        ),
+        Text('Internet: ${services['internet']}'),
+        Text('Transporte Público: ${services['public_transport']}'),
+        // ... otros servicios ...
+  
+        const SizedBox(height: 10),
+  
+        const Divider(),
+  
+        // Mostrar la descripción
+        const Text(
+          'Descripción:',
+          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+        ),
+        Text(location['description']),
+        const Divider(),
+        // Widget de Google Maps
+        SizedBox(
+          height: 200,
+          child: GoogleMap(
+            initialCameraPosition: CameraPosition(
+              target: initialCameraPosition,
+              zoom: 17,
+            ),
+            markers: markers,
+          ),
+        ),
+      ],
+    ),
+  );
+}
+}
+
+
+class Departamento extends Property {
+  final int commonExpenses;
+
+  Departamento({
+    required String name,
+    required String image,
+    required Map<String, dynamic> location,
+    required DocumentReference owner,
+    required int price,
+    required String type,
+    required Map<String, dynamic> distance,
+    required Map<String, dynamic> features,
+    required Map<String, dynamic> services,
+    required String timePeriod,
+    required this.commonExpenses,
+  }) : super(
+          name: name,
+          image: image,
+          location: location,
+          owner: owner,
+          price: price,
+          type: type,
+          distance: distance,
+          features: features,
+          services: services,
+          timePeriod: timePeriod,
+        );
+
+  factory Departamento.fromMap(Map<String, dynamic> map) {
+    return Departamento(
+      name: map['name'] ?? '',
+      image: map['image'] ?? '',
+      location: map['location'] as Map<String, dynamic>,
+      owner: map['owner'], // Asegúrate de que este campo se maneje correctamente como referencia
+      price: map['price'] ?? 0,
+      type: map['type'] ?? '',
+      distance: map['distance'] as Map<String, dynamic>,
+      features: map['features'] as Map<String, dynamic>,
+      services: map['services'] as Map<String, dynamic>,
+      timePeriod: map['time_period'] ?? '',
+      commonExpenses: map['common expenses'] ?? 0,
+    );
+  }
+
+@override
+Widget buildDetailWidget() {
+    LatLng initialCameraPosition = LatLng(
+    location['gps'].latitude, // Asumiendo que 'gps' es un objeto LatLng
+    location['gps'].longitude,
+  );
+
+  Set<Marker> markers = {
+    Marker(
+      markerId: const MarkerId('propertyLocation'),
+      position: initialCameraPosition,
+      infoWindow: const InfoWindow(title: 'Ubicación de la Propiedad'),
+    ),
+  };
+  return Padding(
+    padding: const EdgeInsets.all(16.0),
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          name,
+          style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+        ),
+        const SizedBox(height: 8),
+        Image.network(
+          image,
+          fit: BoxFit.cover,
+          width: double.infinity,
+          height: 200.0, // Ajusta según sea necesario
+        ),
+        const SizedBox(height: 8),
+  
+        const Divider(),
+  
+        Text(
+          'Precio: \$${price.toStringAsFixed(0)}',
+          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+        ),
+        const SizedBox(height: 8),
+  
+        const Divider(),
+  
+        Text(
+          'Gastos comunes: \$${commonExpenses.toStringAsFixed(0)}',
+          style: const TextStyle(fontSize: 18),
+        ),
+        const SizedBox(height: 8),
+  
+        const Divider(),
+  
+        Text(
+          'Ubicación: ${location['address']}',
+          style: const TextStyle(fontSize: 18),
+        ),
+        const SizedBox(height: 8),
+  
+        const Divider(),
+  
+        Text(
+          'Descripción: ${location['description']}',
+          style: const TextStyle(fontSize: 18),
+        ),
+        const SizedBox(height: 8),
+  
+        const Divider(),
+  
+        // Aquí puedes agregar más detalles como características y servicios
+        // Por ejemplo:
+        Text(
+          'Características:',
+          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+        ),
+        Text('Baños: ${features['bathrooms']}'),
+        Text('Habitaciones: ${features['rooms']}'),
+        // ... más características y servicios ...
+                // Widget de Google Maps
+                        const Divider(),
+          SizedBox(
+            height: 200,
+            child: GoogleMap(
+              initialCameraPosition: CameraPosition(
+                target: initialCameraPosition,
+                zoom: 17,
+              ),
+              markers: markers,
+            ),
+          ),
+        // ... más campos si son necesarios ...
+      ],
+    ),
+  );
+}
+}
+
+
+
+class PropertyList extends StatelessWidget {
+  final bool showPensiones;
+  final bool showRoomies;
+  final bool showArriendos;
+
+  const PropertyList({
+    super.key,
+    required this.showPensiones,
+    required this.showRoomies,
+    required this.showArriendos,
+  });
+  
   @override
   Widget build(BuildContext context) {
     return StreamBuilder(
-      stream: FirebaseFirestore.instance.collection('properties').snapshots(),
+      stream: FirebaseFirestore.instance.collection('properties').where('type', isEqualTo: showPensiones ? 'pension' : null).where('type', isEqualTo: showRoomies ? 'roomie' : null).where('type', isEqualTo: showArriendos ? 'departamento' : null).snapshots(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const CircularProgressIndicator();
@@ -56,10 +519,19 @@ class PropertyList extends StatelessWidget {
         }
 
         final List<QueryDocumentSnapshot> documents = snapshot.data!.docs;
-        final List<Property> properties = documents
-            .map((doc) => Property.fromMap(doc.data() as Map<String, dynamic>))
-            .toList();
-
+        final List<Property> properties = documents.map((doc) {
+        Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
+        switch (data['type']) {
+          case 'roomie':
+            return Roomie.fromMap(data);
+          case 'pension':
+            return Pension.fromMap(data);
+          case 'departamento':
+            return Departamento.fromMap(data);
+          default:
+            return Property.fromMap(data); // O manejar de alguna manera si el tipo no es reconocido
+        }
+}).toList();
         return ListView.builder(
           itemCount: properties.length,
           itemBuilder: (context, index) {
@@ -74,75 +546,83 @@ class PropertyList extends StatelessWidget {
                     ),
                   );
                 },
-                child: Card(
-                  margin: const EdgeInsets.all(8.0),
-                  shape: RoundedRectangleBorder(
-                    borderRadius:
-                        BorderRadius.circular(8.0), // Adjusted border radius
+child: Card(
+      margin: const EdgeInsets.all(8.0),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(8.0),
+      ),
+      elevation: 4,
+      child: Column(
+        children: [
+ClipRRect(
+  borderRadius: const BorderRadius.only(
+    topLeft: Radius.circular(8.0),
+    topRight: Radius.circular(8.0),
+  ),
+  child: property.image.isNotEmpty 
+    ? Image.network(
+        property.image,
+        width: double.infinity,
+        height: 150.0,
+        fit: BoxFit.cover,
+        errorBuilder: (context, error, stackTrace) {
+          return Image.asset(
+            'web\asset\yoshi_waton.jpg', // Ruta a tu imagen placeholder local
+            width: double.infinity,
+            height: 150.0,
+            fit: BoxFit.cover,
+          );
+        },
+      )
+    : Image.asset(
+        'web/assets/yoshi_waton.jpg', // Ruta a tu imagen placeholder local
+        width: double.infinity,
+        height: 150.0,
+        fit: BoxFit.cover,
+      ),
+),
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: ListTile(
+              title: Text(
+                property.name,
+                style: const TextStyle(
+                  fontSize: 18.0,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              subtitle: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    // Asumiendo que distance es un mapa con la clave 'time'
+                    'Tiempo a la universidad: ${property.distance['time'] ?? 'No disponible'}',
+                    style: const TextStyle(
+                      fontSize: 14.0,
+                    ),
                   ),
-                  elevation: 4, // Added elevation for a card-like appearance
-                  child: Column(
-                    children: [
-                      ClipRRect(
-                        borderRadius: const BorderRadius.only(
-                          topLeft:
-                              Radius.circular(8.0), // Adjusted border radius
-                          topRight:
-                              Radius.circular(8.0), // Adjusted border radius
-                        ),
-                        child: Image.network(
-                          property.imageUrl,
-                          width: double.infinity,
-                          height: 150.0,
-                          fit: BoxFit.cover,
-                        ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.all(
-                            8.0), // Added padding to the content
-                        child: ListTile(
-                          title: Text(
-                            property.name,
-                            style: const TextStyle(
-                              fontSize: 18.0, // Increased font size
-                              fontWeight: FontWeight.bold, // Bold text
-                            ),
-                          ),
-                          subtitle: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                property.info1,
-                                style: const TextStyle(
-                                  fontSize: 14.0, // Adjusted font size
-                                ),
-                              ),
-                              Text(
-                                property.info2,
-                                style: const TextStyle(
-                                  fontSize: 14.0, // Adjusted font size
-                                ),
-                              ),
-                              Text(
-                                '\$${property.price.toStringAsFixed(0)}',
-                                style: const TextStyle(
-                                  fontSize: 16.0, // Increased font size
-                                  fontWeight: FontWeight.bold, // Bold text
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ],
+                  Text(
+                    '\$${property.price.toStringAsFixed(0)}',
+                    style: const TextStyle(
+                      fontSize: 16.0,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
-                ));
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    ),
+);
           },
         );
       },
     );
   }
 }
+
 
 class PropertyDetailsScreen extends StatelessWidget {
   final Property property;
@@ -151,150 +631,12 @@ class PropertyDetailsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Create a LatLng for the initial camera position
-    LatLng? initialCameraPosition;
-    // Default coordinates
-    const defaultLatitude = -33.4523759;
-    const defaultLongitude = -70.6662541;
-    if (property.geoPoint != null) {
-      initialCameraPosition = LatLng(
-        property.geoPoint!.latitude,
-        property.geoPoint!.longitude,
-      );
-    } else {
-      // Handle the case where geoPoint is null, or provide a default LatLng.
-      // For example, using the coordinates of a default location:
-      initialCameraPosition = const LatLng(defaultLatitude, defaultLongitude);
-    }
-
-    // Create a Set of markers (if needed)
-    Set<Marker> markers;
-
-    // ignore: unnecessary_null_comparison
-    if (initialCameraPosition != null) {
-      markers = {
-        Marker(
-          markerId: const MarkerId('propertyLocation'),
-          position: initialCameraPosition,
-          infoWindow: const InfoWindow(title: 'Property Location'),
-        ),
-      };
-    } else {
-      // Handle the case where initialCameraPosition is null or provide a default marker location.
-      // For example, using the coordinates of a default location:
-      markers = {
-        const Marker(
-          markerId: MarkerId('defaultLocation'),
-          position: LatLng(defaultLatitude, defaultLongitude),
-          infoWindow: InfoWindow(title: 'Default Location'),
-        ),
-      };
-    }
-
     return Scaffold(
       appBar: AppBar(
-        title: const Text(
-          'Detalles de propiedades',
-          style: TextStyle(
-            color: Colors.black,
-          ),
-        ),
+        title: Text(property.name),
       ),
       body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            children: <Widget>[
-              CarouselSlider(
-                options: CarouselOptions(
-                  aspectRatio: 2.0,
-                  enlargeCenterPage: true,
-                  enableInfiniteScroll: false,
-                  initialPage: 0,
-                  autoPlay: true,
-                ),
-                items: [
-                  Image.network(property.imageUrl,
-                      fit: BoxFit.cover, width: 1000.0)
-                ],
-              ),
-              ListTile(
-                title: Text(
-                  property.name,
-                  style: const TextStyle(
-                    fontSize: 25.0, // Increased font size
-                    fontWeight: FontWeight.bold, // Bold text
-                  ),
-                ),
-                subtitle: const Text('PLACEHOLDER DISTANCIA'),
-                trailing: IconButton(
-                  icon: const Icon(Icons.favorite_border),
-                  onPressed: () {},
-                  iconSize: 35.0,
-                ),
-              ),
-
-              const Divider(),
-
-              // 'Caracteristicas' as a title and a two column bullet list below with caracteristicas
-              const Text(
-                'Caracteristicas',
-                style: TextStyle(
-                  fontSize: 20.0, // Increased font size
-                  fontWeight: FontWeight.bold, // Bold text
-                ),
-              ),
-
-              // Round user image to the right and name to the left
-              Row(
-                children: [
-                  // Image with rounded corners
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(
-                        50.0), // You can adjust the radius as needed
-                    child: const Icon(
-                      Icons.person,
-                      size: 60,
-                    ),
-                  ),
-                  const SizedBox(
-                      width: 16.0), // Add spacing between the image and text
-                  // Text widget
-                  const Expanded(
-                    child: Text(
-                      'NAME PLACEHOLDER',
-                      style: TextStyle(fontSize: 18.0),
-                    ),
-                  ),
-                ],
-              ),
-
-              const Divider(),
-              Text(property.info1),
-              Text(property.info2),
-              Text('\$${property.price.toStringAsFixed(0)}'),
-
-              // Google Maps widget
-              SizedBox(
-                height: 200, // Adjust the height as needed
-                child: GoogleMap(
-                  // ignore: unnecessary_null_comparison
-                  initialCameraPosition: initialCameraPosition != null
-                      ? CameraPosition(
-                          target: initialCameraPosition,
-                          zoom: 17, // Adjust the initial zoom level as needed
-                        )
-                      : const CameraPosition(
-                          target: LatLng(defaultLatitude,
-                              defaultLongitude), // Provide default coordinates
-                          zoom: 11, // Default zoom level
-                        ),
-                  markers: markers, // Add your markers
-                ),
-              )
-            ],
-          ),
-        ),
+        child: property.buildDetailWidget(),
       ),
     );
   }

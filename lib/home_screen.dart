@@ -2,9 +2,21 @@ import 'package:flutter/material.dart';
 import 'package:flutter_application_1/saved_screen.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'profile_screen.dart';
+import 'property.dart'; // Asegúrate de importar PropertyList
 
-class HomeScreen extends StatelessWidget {
+
+class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
+
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  bool showPensiones = false;
+  bool showRoomies = false;
+  bool showArriendos = false;
+
 
   @override
   Widget build(BuildContext context) {
@@ -24,24 +36,46 @@ class HomeScreen extends StatelessWidget {
               children: [
                 ElevatedButton(
                   onPressed: () {
-                    // Handle bdutton 1 action
+                    setState(() {
+                      showPensiones = !showPensiones;
+                    });
                   },
-                  child: const Text('Pensiones'),
+                  child: Text('Pensiones'),
+                  style: ElevatedButton.styleFrom(
+                    primary: showPensiones ? Colors.blue : Colors.grey,
+                  ),
                 ),
                 ElevatedButton(
                   onPressed: () {
-                    // Handle button 2 action
+                    setState(() {
+                      showRoomies = !showRoomies;
+                    });
                   },
-                  child: const Text('Roomies'),
+                  child: Text('Roomies'),
+                  style: ElevatedButton.styleFrom(
+                    primary: showRoomies ? Colors.blue : Colors.grey,
+                  ),
                 ),
                 ElevatedButton(
                   onPressed: () {
-                    // Handle button 3 action
+                    setState(() {
+                      showArriendos = !showArriendos;
+                    });
                   },
-                  child: const Text('Arriendos'),
+                  child: Text('Dptos'),
+                  style: ElevatedButton.styleFrom(
+                    primary: showArriendos ? Colors.blue : Colors.grey,
+                  ),
                 ),
               ],
             ),
+              Expanded(
+                child: PropertyList(
+                  showPensiones: showPensiones,
+                  showRoomies: showRoomies,
+                  showArriendos: showArriendos,
+                ),
+              ),
           ],
         ),
       ),
