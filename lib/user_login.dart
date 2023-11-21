@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_application_1/user_signup.dart';
+import 'package:provider/provider.dart';
 import 'main.dart'; // Import your main.dart file where AuthenticationWrapper is defined
 
 class LoginScreen extends StatefulWidget {
@@ -18,11 +19,20 @@ class _LoginScreenState extends State<LoginScreen> {
   // Function to sign in the user
   Future<void> _signIn(BuildContext context) async {
     try {
-      await FirebaseAuth.instance.signInWithEmailAndPassword(
+      UserCredential userCredential =
+          await FirebaseAuth.instance.signInWithEmailAndPassword(
         email: _emailController.text,
         password: _passwordController.text,
       );
+
+      User user = userCredential.user!;
+
       // User signed in successfully, navigate back to the authentication screen
+
+      // ignore: use_build_context_synchronously
+      await Provider.of<UserModel>(context, listen: false)
+          .updateUserInfoFromFirebase(user);
+
       // ignore: use_build_context_synchronously
       Navigator.pushReplacement(
         context,
