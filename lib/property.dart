@@ -491,24 +491,74 @@ Widget buildDetailWidget() {
 }
 }
 
+Query buildPropertyQuery({
+  required bool showPensiones,
+  required bool showRoomies,
+  required bool showArriendos,
+  required String searchText,
+}) {
+  Query query = FirebaseFirestore.instance.collection('properties');
+
+  // Filtrar por tipo
+  if (showPensiones || showRoomies || showArriendos) {
+    List<String> types = [];
+    if (showPensiones) types.add('pension');
+    if (showRoomies) types.add('roomie');
+    if (showArriendos) types.add('departamento');
+    query = query.where('type', whereIn: types);
+  }
+
+  if (searchText.isNotEmpty) {
+    // Implementa la lógica de búsqueda de subcadenas aquí
+    String searchLower = searchText.toLowerCase();
+    String searchUpper = searchText.toLowerCase().replaceRange(
+      searchText.length - 1,
+      searchText.length,
+      String.fromCharCode(searchText.codeUnitAt(searchText.length - 1) + 1),
+    );
+
+    query = query.where('name', isGreaterThanOrEqualTo: searchLower)
+                 .where('name', isLessThan: searchUpper);
+  }
+
+  return query;
+}
 
 
 class PropertyList extends StatelessWidget {
   final bool showPensiones;
   final bool showRoomies;
   final bool showArriendos;
+  final String searchText;
+
+
 
   const PropertyList({
     super.key,
     required this.showPensiones,
     required this.showRoomies,
     required this.showArriendos,
+    required this.searchText,
+
   });
+  
+
+
   
   @override
   Widget build(BuildContext context) {
+    // Construir la consulta
+    Query query = buildPropertyQuery(
+      showPensiones: showPensiones,
+      showRoomies: showRoomies,
+      showArriendos: showArriendos,
+      searchText: searchText,
+    );
+
+
+
     return StreamBuilder(
-      stream: FirebaseFirestore.instance.collection('properties').where('type', isEqualTo: showPensiones ? 'pension' : null).where('type', isEqualTo: showRoomies ? 'roomie' : null).where('type', isEqualTo: showArriendos ? 'departamento' : null).snapshots(),
+      stream: query.snapshots(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const CircularProgressIndicator();

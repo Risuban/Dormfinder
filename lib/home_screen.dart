@@ -16,6 +16,19 @@ class _HomeScreenState extends State<HomeScreen> {
   bool showPensiones = false;
   bool showRoomies = false;
   bool showArriendos = false;
+  final TextEditingController searchController = TextEditingController();
+  String searchText = ""; // Añade esta línea
+
+  
+
+  void _onSearchSubmitted(String searchText) {
+  setState(() {
+    // Actualiza tu lógica de búsqueda aquí
+    this.searchText = searchText;
+
+  });
+}
+
 
 
   @override
@@ -25,11 +38,14 @@ class _HomeScreenState extends State<HomeScreen> {
         padding: const EdgeInsets.only(top: 8.0, left: 8.0, right: 8.0),
         child: Column(
           children: [
-            const SearchBar(
-              padding: MaterialStatePropertyAll<EdgeInsets>(
-                  EdgeInsets.symmetric(horizontal: 16.0)),
-              leading: Icon(Icons.search),
-              hintText: ("Pensión de estudiantes"),
+            TextField(
+              controller: searchController,
+              decoration: InputDecoration(
+                prefixIcon: Icon(Icons.search),
+                hintText: 'Pensión de estudiantes',
+                border: OutlineInputBorder(),
+              ),
+              onSubmitted: _onSearchSubmitted, // Se llama cuando se presiona Enter
             ),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -74,6 +90,8 @@ class _HomeScreenState extends State<HomeScreen> {
                   showPensiones: showPensiones,
                   showRoomies: showRoomies,
                   showArriendos: showArriendos,
+                  searchText: searchText,
+
                 ),
               ),
           ],
