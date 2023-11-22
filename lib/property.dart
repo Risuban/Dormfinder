@@ -127,10 +127,18 @@ class Roomie extends Property {
                 autoPlay: true,
               ),
               items: [
-                Image.network(
-                  image.isNotEmpty ? image : 'web/assets/yoshi_waton.jpg',
+                FadeInImage(
+                  placeholder: const NetworkImage(
+                    'https://upload.wikimedia.org/wikipedia/commons/thumb/3/3f/Placeholder_view_vector.svg/310px-Placeholder_view_vector.svg.png',
+                  ), // Imagen gris como placeholder
+                  image: image.isNotEmpty
+                      ? NetworkImage(image)
+                      : const NetworkImage(
+                          'https://upload.wikimedia.org/wikipedia/commons/thumb/3/3f/Placeholder_view_vector.svg/310px-Placeholder_view_vector.svg.png',
+                        ), // Imagen gris como placeholder
+                  width: double.infinity,
+                  height: 150.0,
                   fit: BoxFit.cover,
-                  width: 1000.0,
                 ),
               ],
             ),
@@ -283,10 +291,13 @@ class Pension extends Property {
           // Mostrar la imagen
           FadeInImage(
             placeholder: const NetworkImage(
-                'https://upload.wikimedia.org/wikipedia/commons/thumb/3/3f/Placeholder_view_vector.svg/310px-Placeholder_view_vector.svg.png'), // Imagen gris como placeholder
-            image: NetworkImage(
-              image,
-            ),
+              'https://upload.wikimedia.org/wikipedia/commons/thumb/3/3f/Placeholder_view_vector.svg/310px-Placeholder_view_vector.svg.png',
+            ), // Imagen gris como placeholder
+            image: image.isNotEmpty
+                ? NetworkImage(image)
+                : const NetworkImage(
+                    'https://upload.wikimedia.org/wikipedia/commons/thumb/3/3f/Placeholder_view_vector.svg/310px-Placeholder_view_vector.svg.png',
+                  ), // Imagen gris como placeholder
             width: double.infinity,
             height: 150.0,
             fit: BoxFit.cover,
@@ -603,23 +614,19 @@ class PropertyList extends StatelessWidget {
                         topLeft: Radius.circular(8.0),
                         topRight: Radius.circular(8.0),
                       ),
-                      child: property.image.isNotEmpty
-                          ? FadeInImage(
-                              placeholder: const NetworkImage(
-                                  'https://upload.wikimedia.org/wikipedia/commons/thumb/3/3f/Placeholder_view_vector.svg/310px-Placeholder_view_vector.svg.png'), // Imagen gris como placeholder
-                              image: NetworkImage(
-                                property.image,
-                              ),
-                              width: double.infinity,
-                              height: 150.0,
-                              fit: BoxFit.cover,
-                            )
-                          : Image.asset(
-                              'web/assets/yoshi_waton.jpg', // Ruta a tu imagen placeholder local
-                              width: double.infinity,
-                              height: 150.0,
-                              fit: BoxFit.cover,
-                            ),
+                      child: FadeInImage(
+                        placeholder: const NetworkImage(
+                          'https://upload.wikimedia.org/wikipedia/commons/thumb/3/3f/Placeholder_view_vector.svg/310px-Placeholder_view_vector.svg.png',
+                        ), // Imagen gris como placeholder
+                        image: property.image.isNotEmpty
+                            ? NetworkImage(property.image)
+                            : const NetworkImage(
+                                'https://upload.wikimedia.org/wikipedia/commons/thumb/3/3f/Placeholder_view_vector.svg/310px-Placeholder_view_vector.svg.png',
+                              ), // Imagen gris como placeholder
+                        width: double.infinity,
+                        height: 150.0,
+                        fit: BoxFit.cover,
+                      ),
                     ),
                     Padding(
                       padding: const EdgeInsets.all(8.0),
