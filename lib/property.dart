@@ -526,19 +526,21 @@ Query buildPropertyQuery({
 
 
 class PropertyList extends StatelessWidget {
-  final bool showPensiones;
-  final bool showRoomies;
-  final bool showArriendos;
-  final String searchText;
+  final Query query;
+  // final bool showPensiones;
+  // final bool showRoomies;
+  // final bool showArriendos;
+  // final String searchText;
 
 
 
   const PropertyList({
     super.key,
-    required this.showPensiones,
-    required this.showRoomies,
-    required this.showArriendos,
-    required this.searchText,
+    // required this.showPensiones,
+    // required this.showRoomies,
+    // required this.showArriendos,
+    // required this.searchText,
+    required this.query
 
   });
   
@@ -547,15 +549,6 @@ class PropertyList extends StatelessWidget {
   
   @override
   Widget build(BuildContext context) {
-    // Construir la consulta
-    Query query = buildPropertyQuery(
-      showPensiones: showPensiones,
-      showRoomies: showRoomies,
-      showArriendos: showArriendos,
-      searchText: searchText,
-    );
-
-
 
     return StreamBuilder(
       stream: query.snapshots(),

@@ -3,6 +3,8 @@ import 'package:flutter_application_1/saved_screen.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'profile_screen.dart';
 import 'property.dart'; // Asegúrate de importar PropertyList
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 
 
 class HomeScreen extends StatefulWidget {
@@ -12,27 +14,76 @@ class HomeScreen extends StatefulWidget {
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
+Query buildHomeQuery({
+  required bool showPensiones,
+  required bool showRoomies,
+  required bool showArriendos,
+  required String searchText,
+}) {
+  Query query = FirebaseFirestore.instance.collection('properties');
+
+  // Filtrar por tipo
+  List<String> types = [];
+  if (showPensiones) types.add('pension');
+  if (showRoomies) types.add('roomie');
+  if (showArriendos) types.add('departamento');
+  if (types.isNotEmpty) {
+    query = query.where('type', whereIn: types);
+  }
+
+  // Filtrar por texto de búsqueda
+  if (searchText.isNotEmpty) {
+    query = query.where('name', isEqualTo: searchText);
+  }
+
+  return query;
+}
+
+Query buildSavedQuery(List<String> savedPropertyIds) {
+  return FirebaseFirestore.instance
+      .collection('properties')
+      .where(FieldPath.documentId, whereIn: savedPropertyIds);
+}
+
+
+
 class _HomeScreenState extends State<HomeScreen> {
   bool showPensiones = false;
   bool showRoomies = false;
   bool showArriendos = false;
   final TextEditingController searchController = TextEditingController();
-  String searchText = ""; // Añade esta línea
+  int currentPageIndex = 0;
 
   
-
   void _onSearchSubmitted(String searchText) {
-  setState(() {
-    // Actualiza tu lógica de búsqueda aquí
-    this.searchText = searchText;
-
-  });
-}
-
-
+    setState(() {
+      this.searchController.text = searchText;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
+    Widget content;
+
+    // Por defecto, establecemos el contenido de la página de inicio
+    Query homeQuery = buildHomeQuery(
+      showPensiones: showPensiones,
+      showRoomies: showRoomies,
+      showArriendos: showArriendos,
+      searchText: searchController.text,
+    );
+    content = PropertyList(query: homeQuery);
+
+    // Cambia el contenido según el índice de la página actual
+    if (currentPageIndex == 1) {
+      content = ProfileScreen();
+    } else if (currentPageIndex == 2) {
+      // // Aquí puedes definir el contenido para la página de guardados
+      // // Ejemplo (debes completar la lógica para obtener savedPropertyIds):
+      // List<String> savedPropertyIds = /* Obtén los IDs de las propiedades guardadas */;
+      // Query savedQuery = buildSavedQuery(savedPropertyIds);
+      // content = PropertyList(query: savedQuery);
+    }
     return Scaffold(
       body: Padding(
         padding: const EdgeInsets.only(top: 8.0, left: 8.0, right: 8.0),
@@ -86,13 +137,7 @@ class _HomeScreenState extends State<HomeScreen> {
               ],
             ),
               Expanded(
-                child: PropertyList(
-                  showPensiones: showPensiones,
-                  showRoomies: showRoomies,
-                  showArriendos: showArriendos,
-                  searchText: searchText,
-
-                ),
+                child: content,
               ),
           ],
         ),
