@@ -5,8 +5,6 @@ import 'profile_screen.dart';
 import 'property.dart'; // Asegúrate de importar PropertyList
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-
-
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
@@ -45,8 +43,6 @@ Query buildSavedQuery(List<String> savedPropertyIds) {
       .where(FieldPath.documentId, whereIn: savedPropertyIds);
 }
 
-
-
 class _HomeScreenState extends State<HomeScreen> {
   bool showPensiones = false;
   bool showRoomies = false;
@@ -54,10 +50,9 @@ class _HomeScreenState extends State<HomeScreen> {
   final TextEditingController searchController = TextEditingController();
   int currentPageIndex = 0;
 
-  
   void _onSearchSubmitted(String searchText) {
     setState(() {
-      this.searchController.text = searchText;
+      searchController.text = searchText;
     });
   }
 
@@ -76,7 +71,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
     // Cambia el contenido según el índice de la página actual
     if (currentPageIndex == 1) {
-      content = ProfileScreen();
+      content = const ProfileScreen();
     } else if (currentPageIndex == 2) {
       // // Aquí puedes definir el contenido para la página de guardados
       // // Ejemplo (debes completar la lógica para obtener savedPropertyIds):
@@ -91,12 +86,13 @@ class _HomeScreenState extends State<HomeScreen> {
           children: [
             TextField(
               controller: searchController,
-              decoration: InputDecoration(
+              decoration: const InputDecoration(
                 prefixIcon: Icon(Icons.search),
                 hintText: 'Pensión de estudiantes',
                 border: OutlineInputBorder(),
               ),
-              onSubmitted: _onSearchSubmitted, // Se llama cuando se presiona Enter
+              onSubmitted:
+                  _onSearchSubmitted, // Se llama cuando se presiona Enter
             ),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -107,10 +103,10 @@ class _HomeScreenState extends State<HomeScreen> {
                       showPensiones = !showPensiones;
                     });
                   },
-                  child: Text('Pensiones'),
                   style: ElevatedButton.styleFrom(
                     primary: showPensiones ? Colors.blue : Colors.grey,
                   ),
+                  child: const Text('Pensiones'),
                 ),
                 ElevatedButton(
                   onPressed: () {
@@ -118,10 +114,10 @@ class _HomeScreenState extends State<HomeScreen> {
                       showRoomies = !showRoomies;
                     });
                   },
-                  child: Text('Roomies'),
                   style: ElevatedButton.styleFrom(
                     primary: showRoomies ? Colors.blue : Colors.grey,
                   ),
+                  child: const Text('Roomies'),
                 ),
                 ElevatedButton(
                   onPressed: () {
@@ -129,16 +125,16 @@ class _HomeScreenState extends State<HomeScreen> {
                       showArriendos = !showArriendos;
                     });
                   },
-                  child: Text('Dptos'),
                   style: ElevatedButton.styleFrom(
                     primary: showArriendos ? Colors.blue : Colors.grey,
                   ),
+                  child: const Text('Dptos'),
                 ),
               ],
             ),
-              Expanded(
-                child: content,
-              ),
+            Expanded(
+              child: content,
+            ),
           ],
         ),
       ),
@@ -160,8 +156,8 @@ class _MyHomePageState extends State<MyHomePage> {
   final List<Widget> _pages = [
     // ignore: prefer_const_constructors
     HomeScreen(),
-    ProfileScreen(),
-    SavedScreen(),
+    const ProfileScreen(),
+    const SavedScreen(),
   ];
 
   @override

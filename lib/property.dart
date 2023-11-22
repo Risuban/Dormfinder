@@ -46,11 +46,10 @@ class Property {
   // Método buildDetailWidget a ser implementado en las subclases
   Widget buildDetailWidget() {
     // Implementación por defecto o lanzar una excepción si se espera que las subclases lo implementen
-    throw UnimplementedError('buildDetailWidget debe ser implementado en subclases de Property.');
+    throw UnimplementedError(
+        'buildDetailWidget debe ser implementado en subclases de Property.');
   }
 }
-
-
 
 class Roomie extends Property {
   final List<String> rules;
@@ -85,7 +84,8 @@ class Roomie extends Property {
       name: map['name'] ?? '',
       image: map['image'] ?? '',
       location: map['location'] as Map<String, dynamic>,
-      owner: map['owner'], // Aquí deberías manejar la conversión a la referencia del documento
+      owner: map[
+          'owner'], // Aquí deberías manejar la conversión a la referencia del documento
       price: map['price'] ?? 0,
       type: map['type'] ?? '',
       distance: map['distance'] as Map<String, dynamic>,
@@ -96,116 +96,117 @@ class Roomie extends Property {
     );
   }
 
- @override
-Widget buildDetailWidget() {
-  LatLng initialCameraPosition = LatLng(
-    location['gps'].latitude, // Asumiendo que 'gps' es un objeto LatLng
-    location['gps'].longitude,
-  );
+  @override
+  Widget buildDetailWidget() {
+    LatLng initialCameraPosition = LatLng(
+      location['gps'].latitude, // Asumiendo que 'gps' es un objeto LatLng
+      location['gps'].longitude,
+    );
 
-  Set<Marker> markers = {
-    Marker(
-      markerId: const MarkerId('propertyLocation'),
-      position: initialCameraPosition,
-      infoWindow: const InfoWindow(title: 'Ubicación de la Propiedad'),
-    ),
-  };
-
-  return SingleChildScrollView(
-    child: Padding(
-      padding: const EdgeInsets.all(16.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget>[
-          // CarouselSlider para las imágenes
-          CarouselSlider(
-            options: CarouselOptions(
-              aspectRatio: 2.0,
-              enlargeCenterPage: true,
-              enableInfiniteScroll: false,
-              initialPage: 0,
-              autoPlay: true,
-            ),
-            items: [
-              Image.network(
-                image.isNotEmpty ? image : 'web/assets/yoshi_waton.jpg',
-                fit: BoxFit.cover,
-                width: 1000.0,
-              ),
-            ],
-          ),
-          SizedBox(height: 10),
-          Text(
-            name,
-            style: const TextStyle(fontSize: 25.0, fontWeight: FontWeight.bold),
-          ),
-          SizedBox(height: 10),
-          // Sección de Precio
-          Text(
-            'Precio: \$${price.toStringAsFixed(0)}',
-            style: const TextStyle(fontSize: 18),
-          ),
-          const SizedBox(height: 10),
-
-          // Divisor
-          const Divider(),
-
-          // Sección de Descripción
-          Text(
-            'Descripción: ${location['description']}',
-            style: const TextStyle(fontSize: 16),
-          ),
-          const SizedBox(height: 10),
-
-          // Divisor
-          const Divider(),
-
-          // Sección de Tiempo a la universidad
-          Text(
-            'Tiempo a la universidad: ${distance['time']}',
-            style: const TextStyle(fontSize: 16),
-          ),
-          const SizedBox(height: 10),
-
-          // Divisor
-          const Divider(),
-
-          // Sección de Reglas
-          Text(
-            'Reglas:',
-            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-          ),
-          ...rules.map((rule) => Text('• $rule')).toList(),
-          const SizedBox(height: 10),
-
-          // Divisor
-          const Divider(),
-
-          // Sección de Servicios
-          Text(
-            'Servicios:',
-            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-          ),
-          Text('Transporte público: ${services['public_transport']}'),
-          Text('Áreas verdes: ${services['green_areas']}'),
-          // ...añade aquí más campos si son necesarios...
-          SizedBox(height: 20),
-          // Widget de Google Maps
-          SizedBox(
-            height: 200,
-            child: GoogleMap(
-              initialCameraPosition: CameraPosition(
-                target: initialCameraPosition,
-                zoom: 17,
-              ),
-              markers: markers,
-            ),
-          ),
-        ],
+    Set<Marker> markers = {
+      Marker(
+        markerId: const MarkerId('propertyLocation'),
+        position: initialCameraPosition,
+        infoWindow: const InfoWindow(title: 'Ubicación de la Propiedad'),
       ),
-    ),
-  );
-}
+    };
+
+    return SingleChildScrollView(
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            // CarouselSlider para las imágenes
+            CarouselSlider(
+              options: CarouselOptions(
+                aspectRatio: 2.0,
+                enlargeCenterPage: true,
+                enableInfiniteScroll: false,
+                initialPage: 0,
+                autoPlay: true,
+              ),
+              items: [
+                Image.network(
+                  image.isNotEmpty ? image : 'web/assets/yoshi_waton.jpg',
+                  fit: BoxFit.cover,
+                  width: 1000.0,
+                ),
+              ],
+            ),
+            const SizedBox(height: 10),
+            Text(
+              name,
+              style:
+                  const TextStyle(fontSize: 25.0, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 10),
+            // Sección de Precio
+            Text(
+              'Precio: \$${price.toStringAsFixed(0)}',
+              style: const TextStyle(fontSize: 18),
+            ),
+            const SizedBox(height: 10),
+
+            // Divisor
+            const Divider(),
+
+            // Sección de Descripción
+            Text(
+              'Descripción: ${location['description']}',
+              style: const TextStyle(fontSize: 16),
+            ),
+            const SizedBox(height: 10),
+
+            // Divisor
+            const Divider(),
+
+            // Sección de Tiempo a la universidad
+            Text(
+              'Tiempo a la universidad: ${distance['time']}',
+              style: const TextStyle(fontSize: 16),
+            ),
+            const SizedBox(height: 10),
+
+            // Divisor
+            const Divider(),
+
+            // Sección de Reglas
+            const Text(
+              'Reglas:',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+            ...rules.map((rule) => Text('• $rule')).toList(),
+            const SizedBox(height: 10),
+
+            // Divisor
+            const Divider(),
+
+            // Sección de Servicios
+            const Text(
+              'Servicios:',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+            Text('Transporte público: ${services['public_transport']}'),
+            Text('Áreas verdes: ${services['green_areas']}'),
+            // ...añade aquí más campos si son necesarios...
+            const SizedBox(height: 20),
+            // Widget de Google Maps
+            SizedBox(
+              height: 200,
+              child: GoogleMap(
+                initialCameraPosition: CameraPosition(
+                  target: initialCameraPosition,
+                  zoom: 17,
+                ),
+                markers: markers,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 }
 
 class Pension extends Property {
@@ -248,110 +249,116 @@ class Pension extends Property {
       features: map['features'] ?? {},
       services: map['services'] ?? {},
       timePeriod: map['time_period'] ?? '',
-      availableRooms: List<Map<String, dynamic>>.from(map['available_rooms'] ?? []),
+      availableRooms:
+          List<Map<String, dynamic>>.from(map['available_rooms'] ?? []),
     );
   }
 
-@override
-Widget buildDetailWidget() {
+  @override
+  Widget buildDetailWidget() {
     LatLng initialCameraPosition = LatLng(
-    location['gps'].latitude, // Asumiendo que 'gps' es un objeto LatLng
-    location['gps'].longitude,
-  );
+      location['gps'].latitude, // Asumiendo que 'gps' es un objeto LatLng
+      location['gps'].longitude,
+    );
 
-  Set<Marker> markers = {
-    Marker(
-      markerId: const MarkerId('propertyLocation'),
-      position: initialCameraPosition,
-      infoWindow: const InfoWindow(title: 'Ubicación de la Propiedad'),
-    ),
-  };
-  return Padding(
-    padding: const EdgeInsets.all(16.0),
-    child: Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        // Mostrar el nombre
-        Text(
-          name,
-          style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-        ),
-        const SizedBox(height: 10),
-  
-        // Mostrar la imagen
-        Image.network(
-          image,
-          fit: BoxFit.cover,
-          width: double.infinity,
-          height: 200.0,
-        ),
-        const SizedBox(height: 10),
-  
-        // Mostrar el precio
-        Text(
-          'Precio: \$${price.toStringAsFixed(0)}',
-          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-        ),
-        const SizedBox(height: 10),
-  
-        const Divider(),
-  
-        // Mostrar las características de las habitaciones disponibles
-        const Text(
-          'Habitaciones Disponibles:',
-          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-        ),
-        ...availableRooms.map((room) => Text('Habitación: ${room['square_meters']} m², Baño: ${room['bathrooms']}')),
-        const SizedBox(height: 10),
-  
-        const Divider(),
-  
-        // Mostrar la distancia a la universidad
-        Text(
-          'Distancia a la universidad: ${distance['time']}',
-          style: const TextStyle(fontSize: 16),
-        ),
-        const SizedBox(height: 10),
-  
-        const Divider(),
-  
-        // Mostrar servicios
-        const Text(
-          'Servicios:',
-          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-        ),
-        Text('Internet: ${services['internet']}'),
-        Text('Transporte Público: ${services['public_transport']}'),
-        // ... otros servicios ...
-  
-        const SizedBox(height: 10),
-  
-        const Divider(),
-  
-        // Mostrar la descripción
-        const Text(
-          'Descripción:',
-          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-        ),
-        Text(location['description']),
-        const Divider(),
-        // Widget de Google Maps
-        SizedBox(
-          height: 200,
-          child: GoogleMap(
-            initialCameraPosition: CameraPosition(
-              target: initialCameraPosition,
-              zoom: 17,
-            ),
-            markers: markers,
+    Set<Marker> markers = {
+      Marker(
+        markerId: const MarkerId('propertyLocation'),
+        position: initialCameraPosition,
+        infoWindow: const InfoWindow(title: 'Ubicación de la Propiedad'),
+      ),
+    };
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Mostrar el nombre
+          Text(
+            name,
+            style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
           ),
-        ),
-      ],
-    ),
-  );
-}
-}
+          const SizedBox(height: 10),
 
+          // Mostrar la imagen
+          FadeInImage(
+            placeholder: const NetworkImage(
+                'https://upload.wikimedia.org/wikipedia/commons/thumb/3/3f/Placeholder_view_vector.svg/310px-Placeholder_view_vector.svg.png'), // Imagen gris como placeholder
+            image: NetworkImage(
+              image,
+            ),
+            width: double.infinity,
+            height: 150.0,
+            fit: BoxFit.cover,
+          ),
+
+          const SizedBox(height: 10),
+
+          // Mostrar el precio
+          Text(
+            'Precio: \$${price.toStringAsFixed(0)}',
+            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+          ),
+          const SizedBox(height: 10),
+
+          const Divider(),
+
+          // Mostrar las características de las habitaciones disponibles
+          const Text(
+            'Habitaciones Disponibles:',
+            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+          ),
+          ...availableRooms.map((room) => Text(
+              'Habitación: ${room['square_meters']} m², Baño: ${room['bathrooms']}')),
+          const SizedBox(height: 10),
+
+          const Divider(),
+
+          // Mostrar la distancia a la universidad
+          Text(
+            'Distancia a la universidad: ${distance['time']}',
+            style: const TextStyle(fontSize: 16),
+          ),
+          const SizedBox(height: 10),
+
+          const Divider(),
+
+          // Mostrar servicios
+          const Text(
+            'Servicios:',
+            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+          ),
+          Text('Internet: ${services['internet']}'),
+          Text('Transporte Público: ${services['public_transport']}'),
+          // ... otros servicios ...
+
+          const SizedBox(height: 10),
+
+          const Divider(),
+
+          // Mostrar la descripción
+          const Text(
+            'Descripción:',
+            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+          ),
+          Text(location['description']),
+          const Divider(),
+          // Widget de Google Maps
+          SizedBox(
+            height: 200,
+            child: GoogleMap(
+              initialCameraPosition: CameraPosition(
+                target: initialCameraPosition,
+                zoom: 17,
+              ),
+              markers: markers,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
 
 class Departamento extends Property {
   final int commonExpenses;
@@ -386,7 +393,8 @@ class Departamento extends Property {
       name: map['name'] ?? '',
       image: map['image'] ?? '',
       location: map['location'] as Map<String, dynamic>,
-      owner: map['owner'], // Asegúrate de que este campo se maneje correctamente como referencia
+      owner: map[
+          'owner'], // Asegúrate de que este campo se maneje correctamente como referencia
       price: map['price'] ?? 0,
       type: map['type'] ?? '',
       distance: map['distance'] as Map<String, dynamic>,
@@ -397,83 +405,83 @@ class Departamento extends Property {
     );
   }
 
-@override
-Widget buildDetailWidget() {
+  @override
+  Widget buildDetailWidget() {
     LatLng initialCameraPosition = LatLng(
-    location['gps'].latitude, // Asumiendo que 'gps' es un objeto LatLng
-    location['gps'].longitude,
-  );
+      location['gps'].latitude, // Asumiendo que 'gps' es un objeto LatLng
+      location['gps'].longitude,
+    );
 
-  Set<Marker> markers = {
-    Marker(
-      markerId: const MarkerId('propertyLocation'),
-      position: initialCameraPosition,
-      infoWindow: const InfoWindow(title: 'Ubicación de la Propiedad'),
-    ),
-  };
-  return Padding(
-    padding: const EdgeInsets.all(16.0),
-    child: Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          name,
-          style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-        ),
-        const SizedBox(height: 8),
-        Image.network(
-          image,
-          fit: BoxFit.cover,
-          width: double.infinity,
-          height: 200.0, // Ajusta según sea necesario
-        ),
-        const SizedBox(height: 8),
-  
-        const Divider(),
-  
-        Text(
-          'Precio: \$${price.toStringAsFixed(0)}',
-          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-        ),
-        const SizedBox(height: 8),
-  
-        const Divider(),
-  
-        Text(
-          'Gastos comunes: \$${commonExpenses.toStringAsFixed(0)}',
-          style: const TextStyle(fontSize: 18),
-        ),
-        const SizedBox(height: 8),
-  
-        const Divider(),
-  
-        Text(
-          'Ubicación: ${location['address']}',
-          style: const TextStyle(fontSize: 18),
-        ),
-        const SizedBox(height: 8),
-  
-        const Divider(),
-  
-        Text(
-          'Descripción: ${location['description']}',
-          style: const TextStyle(fontSize: 18),
-        ),
-        const SizedBox(height: 8),
-  
-        const Divider(),
-  
-        // Aquí puedes agregar más detalles como características y servicios
-        // Por ejemplo:
-        Text(
-          'Características:',
-          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-        ),
-        Text('Baños: ${features['bathrooms']}'),
-        Text('Habitaciones: ${features['rooms']}'),
-        // ... más características y servicios ...
-                // Widget de Google Maps
-                        const Divider(),
+    Set<Marker> markers = {
+      Marker(
+        markerId: const MarkerId('propertyLocation'),
+        position: initialCameraPosition,
+        infoWindow: const InfoWindow(title: 'Ubicación de la Propiedad'),
+      ),
+    };
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            name,
+            style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+          ),
+          const SizedBox(height: 8),
+          Image.network(
+            image,
+            fit: BoxFit.cover,
+            width: double.infinity,
+            height: 200.0, // Ajusta según sea necesario
+          ),
+          const SizedBox(height: 8),
+
+          const Divider(),
+
+          Text(
+            'Precio: \$${price.toStringAsFixed(0)}',
+            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+          ),
+          const SizedBox(height: 8),
+
+          const Divider(),
+
+          Text(
+            'Gastos comunes: \$${commonExpenses.toStringAsFixed(0)}',
+            style: const TextStyle(fontSize: 18),
+          ),
+          const SizedBox(height: 8),
+
+          const Divider(),
+
+          Text(
+            'Ubicación: ${location['address']}',
+            style: const TextStyle(fontSize: 18),
+          ),
+          const SizedBox(height: 8),
+
+          const Divider(),
+
+          Text(
+            'Descripción: ${location['description']}',
+            style: const TextStyle(fontSize: 18),
+          ),
+          const SizedBox(height: 8),
+
+          const Divider(),
+
+          // Aquí puedes agregar más detalles como características y servicios
+          // Por ejemplo:
+          const Text(
+            'Características:',
+            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+          ),
+          Text('Baños: ${features['bathrooms']}'),
+          Text('Habitaciones: ${features['rooms']}'),
+          // ... más características y servicios ...
+          // Widget de Google Maps
+          const Divider(),
           SizedBox(
             height: 200,
             child: GoogleMap(
@@ -484,11 +492,11 @@ Widget buildDetailWidget() {
               markers: markers,
             ),
           ),
-        // ... más campos si son necesarios ...
-      ],
-    ),
-  );
-}
+          // ... más campos si son necesarios ...
+        ],
+      ),
+    );
+  }
 }
 
 Query buildPropertyQuery({
@@ -512,18 +520,18 @@ Query buildPropertyQuery({
     // Implementa la lógica de búsqueda de subcadenas aquí
     String searchLower = searchText.toLowerCase();
     String searchUpper = searchText.toLowerCase().replaceRange(
-      searchText.length - 1,
-      searchText.length,
-      String.fromCharCode(searchText.codeUnitAt(searchText.length - 1) + 1),
-    );
+          searchText.length - 1,
+          searchText.length,
+          String.fromCharCode(searchText.codeUnitAt(searchText.length - 1) + 1),
+        );
 
-    query = query.where('name', isGreaterThanOrEqualTo: searchLower)
-                 .where('name', isLessThan: searchUpper);
+    query = query
+        .where('name', isGreaterThanOrEqualTo: searchLower)
+        .where('name', isLessThan: searchUpper);
   }
 
   return query;
 }
-
 
 class PropertyList extends StatelessWidget {
   final Query query;
@@ -532,24 +540,16 @@ class PropertyList extends StatelessWidget {
   // final bool showArriendos;
   // final String searchText;
 
+  const PropertyList(
+      {super.key,
+      // required this.showPensiones,
+      // required this.showRoomies,
+      // required this.showArriendos,
+      // required this.searchText,
+      required this.query});
 
-
-  const PropertyList({
-    super.key,
-    // required this.showPensiones,
-    // required this.showRoomies,
-    // required this.showArriendos,
-    // required this.searchText,
-    required this.query
-
-  });
-  
-
-
-  
   @override
   Widget build(BuildContext context) {
-
     return StreamBuilder(
       stream: query.snapshots(),
       builder: (context, snapshot) {
@@ -563,109 +563,105 @@ class PropertyList extends StatelessWidget {
 
         final List<QueryDocumentSnapshot> documents = snapshot.data!.docs;
         final List<Property> properties = documents.map((doc) {
-        Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
-        switch (data['type']) {
-          case 'roomie':
-            return Roomie.fromMap(data);
-          case 'pension':
-            return Pension.fromMap(data);
-          case 'departamento':
-            return Departamento.fromMap(data);
-          default:
-            return Property.fromMap(data); // O manejar de alguna manera si el tipo no es reconocido
-        }
-}).toList();
+          Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
+          switch (data['type']) {
+            case 'roomie':
+              return Roomie.fromMap(data);
+            case 'pension':
+              return Pension.fromMap(data);
+            case 'departamento':
+              return Departamento.fromMap(data);
+            default:
+              return Property.fromMap(
+                  data); // O manejar de alguna manera si el tipo no es reconocido
+          }
+        }).toList();
         return ListView.builder(
           itemCount: properties.length,
           itemBuilder: (context, index) {
             final property = properties[index];
             return GestureDetector(
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) =>
-                          PropertyDetailsScreen(property: property),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) =>
+                        PropertyDetailsScreen(property: property),
+                  ),
+                );
+              },
+              child: Card(
+                margin: const EdgeInsets.all(8.0),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8.0),
+                ),
+                elevation: 4,
+                child: Column(
+                  children: [
+                    ClipRRect(
+                      borderRadius: const BorderRadius.only(
+                        topLeft: Radius.circular(8.0),
+                        topRight: Radius.circular(8.0),
+                      ),
+                      child: property.image.isNotEmpty
+                          ? FadeInImage(
+                              placeholder: const NetworkImage(
+                                  'https://upload.wikimedia.org/wikipedia/commons/thumb/3/3f/Placeholder_view_vector.svg/310px-Placeholder_view_vector.svg.png'), // Imagen gris como placeholder
+                              image: NetworkImage(
+                                property.image,
+                              ),
+                              width: double.infinity,
+                              height: 150.0,
+                              fit: BoxFit.cover,
+                            )
+                          : Image.asset(
+                              'web/assets/yoshi_waton.jpg', // Ruta a tu imagen placeholder local
+                              width: double.infinity,
+                              height: 150.0,
+                              fit: BoxFit.cover,
+                            ),
                     ),
-                  );
-                },
-child: Card(
-      margin: const EdgeInsets.all(8.0),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(8.0),
-      ),
-      elevation: 4,
-      child: Column(
-        children: [
-ClipRRect(
-  borderRadius: const BorderRadius.only(
-    topLeft: Radius.circular(8.0),
-    topRight: Radius.circular(8.0),
-  ),
-  child: property.image.isNotEmpty 
-    ? Image.network(
-        property.image,
-        width: double.infinity,
-        height: 150.0,
-        fit: BoxFit.cover,
-        errorBuilder: (context, error, stackTrace) {
-          return Image.asset(
-            'web\asset\yoshi_waton.jpg', // Ruta a tu imagen placeholder local
-            width: double.infinity,
-            height: 150.0,
-            fit: BoxFit.cover,
-          );
-        },
-      )
-    : Image.asset(
-        'web/assets/yoshi_waton.jpg', // Ruta a tu imagen placeholder local
-        width: double.infinity,
-        height: 150.0,
-        fit: BoxFit.cover,
-      ),
-),
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: ListTile(
-              title: Text(
-                property.name,
-                style: const TextStyle(
-                  fontSize: 18.0,
-                  fontWeight: FontWeight.bold,
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: ListTile(
+                        title: Text(
+                          property.name,
+                          style: const TextStyle(
+                            fontSize: 18.0,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        subtitle: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              // Asumiendo que distance es un mapa con la clave 'time'
+                              'Tiempo a la universidad: ${property.distance['time'] ?? 'No disponible'}',
+                              style: const TextStyle(
+                                fontSize: 14.0,
+                              ),
+                            ),
+                            Text(
+                              '\$${property.price.toStringAsFixed(0)}',
+                              style: const TextStyle(
+                                fontSize: 16.0,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
-              subtitle: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    // Asumiendo que distance es un mapa con la clave 'time'
-                    'Tiempo a la universidad: ${property.distance['time'] ?? 'No disponible'}',
-                    style: const TextStyle(
-                      fontSize: 14.0,
-                    ),
-                  ),
-                  Text(
-                    '\$${property.price.toStringAsFixed(0)}',
-                    style: const TextStyle(
-                      fontSize: 16.0,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ],
-      ),
-    ),
-);
+            );
           },
         );
       },
     );
   }
 }
-
 
 class PropertyDetailsScreen extends StatelessWidget {
   final Property property;

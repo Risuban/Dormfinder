@@ -1,3 +1,5 @@
+// ignore_for_file: avoid_print
+
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_application_1/user_signup.dart';
@@ -5,6 +7,7 @@ import 'package:provider/provider.dart';
 import 'main.dart'; // Import your main.dart file where AuthenticationWrapper is defined
 
 class LoginScreen extends StatefulWidget {
+  // ignore: use_key_in_widget_constructors
   const LoginScreen({Key? key});
 
   @override
@@ -27,18 +30,23 @@ class _LoginScreenState extends State<LoginScreen> {
 
       User user = userCredential.user!;
 
-      // User signed in successfully, navigate back to the authentication screen
+      // User signed in successfully, check if the user is authenticated
+      if (user.uid.isNotEmpty) {
+        // ignore: use_build_context_synchronously
+        final userModel = Provider.of<UserModel>(context, listen: false);
+        await userModel.updateUserInfoFromFirebase(user);
 
-      // ignore: use_build_context_synchronously
-      await Provider.of<UserModel>(context, listen: false)
-          .updateUserInfoFromFirebase(user);
-
-      // ignore: use_build_context_synchronously
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => const AuthenticationWrapper()),
-      );
-      print('User signed in successfully!');
+        // ignore: use_build_context_synchronously
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+              builder: (context) => const AuthenticationWrapper()),
+        );
+        print('User signed in successfully!');
+      } else {
+        // If user is not authenticated, show an error message or handle it accordingly
+        print('User is not authenticated.');
+      }
     } catch (e) {
       // Handle errors (e.g., invalid email/password, user not found, etc.)
       print('Error during sign in: $e');
@@ -50,7 +58,6 @@ class _LoginScreenState extends State<LoginScreen> {
           content: Text(
             'Error al iniciar sesión. Correo o contraseña incorrectos.',
           ),
-          //time
           duration: Duration(seconds: 3),
         ),
       );
@@ -91,7 +98,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 // Navigate to the sign-up screen
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => SignUpScreen()),
+                  MaterialPageRoute(builder: (context) => const SignUpScreen()),
                 );
               },
               child: const Text('Registrarse'),

@@ -1,3 +1,5 @@
+// ignore_for_file: avoid_print
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -42,7 +44,10 @@ class AuthenticationWrapper extends StatelessWidget {
       // If not signed in, navigate to the sign-up screen
       return const LoginScreen();
     } else {
-      // If signed in, navigate to the home screen
+      // reconstruye UserModel con la key del usuario actual
+      final userModel = Provider.of<UserModel>(context, listen: false);
+      userModel.updateUserInfoFromFirebase(FirebaseAuth.instance.currentUser!);
+
       return const MyHomePage();
     }
   }

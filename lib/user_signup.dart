@@ -1,9 +1,12 @@
+// ignore_for_file: avoid_print
+
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_application_1/main.dart';
 
 class SignUpScreen extends StatefulWidget {
+  // ignore: use_key_in_widget_constructors
   const SignUpScreen({Key? key});
 
   @override

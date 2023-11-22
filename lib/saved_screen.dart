@@ -1,21 +1,28 @@
-import 'package:flutter/material.dart';
+// ignore_for_file: avoid_print
+
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'property.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_application_1/main.dart';
+import 'package:flutter_application_1/property.dart';
+import 'package:provider/provider.dart';
 
 class SavedScreen extends StatelessWidget {
-  
+  const SavedScreen({super.key});
+
   @override
   Widget build(BuildContext context) {
-    // // Suponiendo que tienes una forma de obtener los IDs de las propiedades guardadas
-    // List<String> savedPropertyIds = /* obtener los IDs de las propiedades guardadas */;
+    // Obtener UserModel usando Provider
+    UserModel userModel = Provider.of<UserModel>(context);
 
-    // Query query = FirebaseFirestore.instance
-    //     .collection('properties')
-    //     .where(FieldPath.documentId, whereIn: savedPropertyIds);
+    // Obtener las referencias de los documentos guardados desde UserModel
+    List<DocumentReference> savedPropertyReferences = userModel.savedProperties;
+    print(savedPropertyReferences);
 
-    // // return PropertyList(query: query);
-        return const Center(
-      child: Text('Guardados'),
-    );
+    // Crear una consulta que obtenga los documentos correspondientes a las referencias guardadas
+    Query query = FirebaseFirestore.instance.collection('properties').where(
+        FieldPath.documentId,
+        whereIn: savedPropertyReferences.map((ref) => ref.id));
+
+    return PropertyList(query: query);
   }
 }
