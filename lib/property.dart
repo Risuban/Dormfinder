@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:carousel_slider/carousel_slider.dart';
+import 'package:flutter_application_1/main.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:provider/provider.dart';
 
 class Property {
   final String name;
@@ -14,6 +16,7 @@ class Property {
   final Map<String, dynamic> features;
   final Map<String, dynamic> services;
   final String timePeriod;
+  final DocumentReference propertyReference;
 
   Property({
     required this.name,
@@ -26,9 +29,11 @@ class Property {
     required this.features,
     required this.services,
     required this.timePeriod,
+    required this.propertyReference,
   });
 
-  factory Property.fromMap(Map<String, dynamic> map) {
+  factory Property.fromMap(
+      Map<String, dynamic> map, DocumentReference propertyReference) {
     return Property(
       name: map['name'] ?? '',
       image: map['image'] ?? '',
@@ -40,11 +45,12 @@ class Property {
       features: map['features'] as Map<String, dynamic>,
       services: map['services'] as Map<String, dynamic>,
       timePeriod: map['time_period'] ?? '',
+      propertyReference: propertyReference,
     );
   }
 
   // Método buildDetailWidget a ser implementado en las subclases
-  Widget buildDetailWidget() {
+  Widget buildDetailWidget(BuildContext context) {
     // Implementación por defecto o lanzar una excepción si se espera que las subclases lo implementen
     throw UnimplementedError(
         'buildDetailWidget debe ser implementado en subclases de Property.');
@@ -66,6 +72,7 @@ class Roomie extends Property {
     required Map<String, dynamic> services,
     required String timePeriod,
     required this.rules,
+    required DocumentReference propertyReference,
   }) : super(
           name: name,
           image: image,
@@ -77,9 +84,11 @@ class Roomie extends Property {
           features: features,
           services: services,
           timePeriod: timePeriod,
+          propertyReference: propertyReference,
         );
 
-  factory Roomie.fromMap(Map<String, dynamic> map) {
+  factory Roomie.fromMap(
+      Map<String, dynamic> map, DocumentReference propertyReference) {
     return Roomie(
       name: map['name'] ?? '',
       image: map['image'] ?? '',
@@ -93,11 +102,13 @@ class Roomie extends Property {
       services: map['services'] as Map<String, dynamic>,
       timePeriod: map['time_period'] ?? '',
       rules: List<String>.from(map['rules'] ?? []),
+      propertyReference: propertyReference,
     );
   }
 
   @override
-  Widget buildDetailWidget() {
+  Widget buildDetailWidget(BuildContext context) {
+    UserModel userModel = Provider.of<UserModel>(context);
     LatLng initialCameraPosition = LatLng(
       location['gps'].latitude, // Asumiendo que 'gps' es un objeto LatLng
       location['gps'].longitude,
@@ -210,6 +221,18 @@ class Roomie extends Property {
                 markers: markers,
               ),
             ),
+            IconButton(
+              icon: Icon(
+                userModel.savedProperties.contains(propertyReference)
+                    ? Icons.favorite
+                    : Icons.favorite_border,
+                color: Colors.red,
+              ),
+              onPressed: () {
+                // Asegúrate de pasar 'propertyReference' a 'toggleFavorite'
+                userModel.toggleFavorite(context, propertyReference);
+              },
+            ),
           ],
         ),
       ),
@@ -232,6 +255,7 @@ class Pension extends Property {
     required Map<String, dynamic> services,
     required String timePeriod,
     required this.availableRooms,
+    required DocumentReference propertyReference,
   }) : super(
           name: name,
           image: image,
@@ -243,9 +267,11 @@ class Pension extends Property {
           features: features,
           services: services,
           timePeriod: timePeriod,
+          propertyReference: propertyReference,
         );
 
-  factory Pension.fromMap(Map<String, dynamic> map) {
+  factory Pension.fromMap(
+      Map<String, dynamic> map, DocumentReference propertyReference) {
     return Pension(
       name: map['name'] ?? '',
       image: map['image'] ?? '',
@@ -259,11 +285,13 @@ class Pension extends Property {
       timePeriod: map['time_period'] ?? '',
       availableRooms:
           List<Map<String, dynamic>>.from(map['available_rooms'] ?? []),
+      propertyReference: propertyReference,
     );
   }
 
   @override
-  Widget buildDetailWidget() {
+  Widget buildDetailWidget(BuildContext context) {
+    UserModel userModel = Provider.of<UserModel>(context);
     LatLng initialCameraPosition = LatLng(
       location['gps'].latitude, // Asumiendo que 'gps' es un objeto LatLng
       location['gps'].longitude,
@@ -365,6 +393,18 @@ class Pension extends Property {
               markers: markers,
             ),
           ),
+          IconButton(
+            icon: Icon(
+              userModel.savedProperties.contains(propertyReference)
+                  ? Icons.favorite
+                  : Icons.favorite_border,
+              color: Colors.red,
+            ),
+            onPressed: () {
+              // Llama al método y proporciona el BuildContext
+              userModel.toggleFavorite(context, propertyReference);
+            },
+          )
         ],
       ),
     );
@@ -386,6 +426,7 @@ class Departamento extends Property {
     required Map<String, dynamic> services,
     required String timePeriod,
     required this.commonExpenses,
+    required DocumentReference propertyReference,
   }) : super(
           name: name,
           image: image,
@@ -397,9 +438,11 @@ class Departamento extends Property {
           features: features,
           services: services,
           timePeriod: timePeriod,
+          propertyReference: propertyReference,
         );
 
-  factory Departamento.fromMap(Map<String, dynamic> map) {
+  factory Departamento.fromMap(
+      Map<String, dynamic> map, DocumentReference propertyReference) {
     return Departamento(
       name: map['name'] ?? '',
       image: map['image'] ?? '',
@@ -413,11 +456,13 @@ class Departamento extends Property {
       services: map['services'] as Map<String, dynamic>,
       timePeriod: map['time_period'] ?? '',
       commonExpenses: map['common expenses'] ?? 0,
+      propertyReference: propertyReference,
     );
   }
 
   @override
-  Widget buildDetailWidget() {
+  Widget buildDetailWidget(BuildContext context) {
+    UserModel userModel = Provider.of<UserModel>(context);
     LatLng initialCameraPosition = LatLng(
       location['gps'].latitude, // Asumiendo que 'gps' es un objeto LatLng
       location['gps'].longitude,
@@ -503,7 +548,18 @@ class Departamento extends Property {
               markers: markers,
             ),
           ),
-          // ... más campos si son necesarios ...
+          IconButton(
+            icon: Icon(
+              userModel.savedProperties.contains(propertyReference)
+                  ? Icons.favorite
+                  : Icons.favorite_border,
+              color: Colors.red,
+            ),
+            onPressed: () {
+              // Llama al método y proporciona el BuildContext
+              userModel.toggleFavorite(context, propertyReference);
+            },
+          )
         ],
       ),
     );
@@ -546,18 +602,8 @@ Query buildPropertyQuery({
 
 class PropertyList extends StatelessWidget {
   final Query query;
-  // final bool showPensiones;
-  // final bool showRoomies;
-  // final bool showArriendos;
-  // final String searchText;
 
-  const PropertyList(
-      {super.key,
-      // required this.showPensiones,
-      // required this.showRoomies,
-      // required this.showArriendos,
-      // required this.searchText,
-      required this.query});
+  const PropertyList({super.key, required this.query});
 
   @override
   Widget build(BuildContext context) {
@@ -577,16 +623,16 @@ class PropertyList extends StatelessWidget {
           Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
           switch (data['type']) {
             case 'roomie':
-              return Roomie.fromMap(data);
+              return Roomie.fromMap(data, doc.reference);
             case 'pension':
-              return Pension.fromMap(data);
+              return Pension.fromMap(data, doc.reference);
             case 'departamento':
-              return Departamento.fromMap(data);
+              return Departamento.fromMap(data, doc.reference);
             default:
-              return Property.fromMap(
-                  data); // O manejar de alguna manera si el tipo no es reconocido
+              return Property.fromMap(data, doc.reference);
           }
         }).toList();
+
         return ListView.builder(
           itemCount: properties.length,
           itemBuilder: (context, index) {
@@ -617,12 +663,12 @@ class PropertyList extends StatelessWidget {
                       child: FadeInImage(
                         placeholder: const NetworkImage(
                           'https://upload.wikimedia.org/wikipedia/commons/thumb/3/3f/Placeholder_view_vector.svg/310px-Placeholder_view_vector.svg.png',
-                        ), // Imagen gris como placeholder
+                        ),
                         image: property.image.isNotEmpty
                             ? NetworkImage(property.image)
                             : const NetworkImage(
                                 'https://upload.wikimedia.org/wikipedia/commons/thumb/3/3f/Placeholder_view_vector.svg/310px-Placeholder_view_vector.svg.png',
-                              ), // Imagen gris como placeholder
+                              ),
                         width: double.infinity,
                         height: 150.0,
                         fit: BoxFit.cover,
@@ -642,7 +688,6 @@ class PropertyList extends StatelessWidget {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              // Asumiendo que distance es un mapa con la clave 'time'
                               'Tiempo a la universidad: ${property.distance['time'] ?? 'No disponible'}',
                               style: const TextStyle(
                                 fontSize: 14.0,
@@ -682,7 +727,7 @@ class PropertyDetailsScreen extends StatelessWidget {
         title: Text(property.name),
       ),
       body: SingleChildScrollView(
-        child: property.buildDetailWidget(),
+        child: property.buildDetailWidget(context),
       ),
     );
   }
