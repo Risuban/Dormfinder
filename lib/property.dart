@@ -160,6 +160,12 @@ class Roomie extends Property {
               style:
                   const TextStyle(fontSize: 25.0, fontWeight: FontWeight.bold),
             ),
+            Text(
+              '\$ $price',
+              style:
+                  const TextStyle(fontSize: 25.0, fontWeight: FontWeight.bold),
+            ),
+            
             const SizedBox(height: 10),
 
             // Sección de Descripción
@@ -326,7 +332,11 @@ class Pension extends Property {
           const SizedBox(height: 10),
 
           // Mostrar el precio
-
+            Text(
+              '\$ $price',
+              style:
+                  const TextStyle(fontSize: 25.0, fontWeight: FontWeight.bold),
+            ),
           // Mostrar las características de las habitaciones disponibles
           const Text(
             'Habitaciones Disponibles:',
@@ -469,6 +479,11 @@ class Departamento extends Property {
             name,
             style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
           ),
+                      Text(
+              '\$ $price',
+              style:
+                  const TextStyle(fontSize: 25.0, fontWeight: FontWeight.bold),
+            ),
           const SizedBox(height: 8),
           Image.network(
             image,
@@ -739,34 +754,12 @@ class PropertyDetailsScreen extends StatelessWidget {
       body: SingleChildScrollView(
         child: property.buildDetailWidget(context),
       ),
-      bottomNavigationBar: BottomAppBar(
-        color: Theme.of(context).colorScheme.surface ,
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Padding(
-              padding: EdgeInsets.all(16.0),
-              child: Text(
-                'Precio: \$${property.price}',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-              ),
-            ),
-            Padding(
-              padding: EdgeInsets.only(right: 16.0),
-              child: ElevatedButton(
-                onPressed: () => _contactOwner(property.owner),
-                style: ElevatedButton.styleFrom(
-                  primary:
-                      Theme.of(context).primaryColor, // Color primario oscuro
-                ),
-                child: Text(
-                  'Contactar',
-                  style: TextStyle(color: Colors.white, fontSize: 15),
-                ),
-              ),
-            ),
-          ],
-        ),
+      floatingActionButton: FloatingActionButton.extended(
+        label: const Text("Llamar"),
+        tooltip: "Contactarse con Arrendatario",
+        foregroundColor: Theme.of(context).colorScheme.primary,
+        onPressed: () => _contactOwner(property.owner),
+        icon: const Icon(Icons.phone),
       ),
     );
   }
