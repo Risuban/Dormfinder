@@ -57,77 +57,51 @@ class ProfileScreen extends StatelessWidget {
           return Padding(
             padding: const EdgeInsets.all(16.0),
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 // Información del usuario
-                Row(
-                  children: [
-                    // Icono de usuario (puedes cambiarlo por el que prefieras)
-                    const Icon(
-                      Icons.account_circle_outlined,
-                      size: 100,
-                    ),
-                    const SizedBox(width: 16),
-                    // Información del usuario
-                    Text(
-                      userModel.userName,
-                      style: const TextStyle(
-                          fontSize: 25, fontWeight: FontWeight.bold),
-                    ),
-                  ],
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [const Icon(
+                    Icons.account_circle_outlined,
+                    size: 100,
+                  ),
+                Text(
+                  userModel.userName,
+                  style: const TextStyle(
+                      fontSize: 25, fontWeight: FontWeight.bold),
                 ),
+                  Text(userModel.email),
+                  Text(userModel.phoneNumber),
+                  ]
+                ),
+                const SizedBox(width: 16),
+                // Información del usuario
 
                 const Divider(
                   color: Colors.black,
-                  thickness: 1,
-                ),
-                Row(children: [
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Text('Información',
-                          style: TextStyle(
-                              fontSize: 20, fontWeight: FontWeight.bold)),
-                      Text('Correo Electrónico: ${userModel.email}'),
-                      Text('Número de Teléfono: ${userModel.phoneNumber}'),
-                    ],
-                  ),
-                ]),
-                const Divider(
-                  color: Colors.black,
-                  thickness: 1,
+                  thickness: 0.3,
                 ),
                 // Configuración del usuario
-                const Text('Configuración',
-                    style:
-                        TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+
                 Padding(
-                  padding: const EdgeInsets.only(left: 8, right: 8),
-                  child: Row(
-                    children: [
-                      // Icono de eliminar usuario (puedes cambiarlo por el que prefieras)
-                      const Icon(Icons.person_remove_rounded, size: 30),
-                      const SizedBox(width: 16),
-                      // Texto "Eliminar cuenta"
-                      const Text(
-                        'Eliminar cuenta',
-                        style: TextStyle(fontSize: 15, color: Colors.black),
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  child: Card(
+                    elevation: 0,
+                    shape: RoundedRectangleBorder(
+                      side: BorderSide(
+                        color: Theme.of(context).colorScheme.outlineVariant,
                       ),
-                      // boton Icon button flecha alineado a la derecha
-                      const Spacer(),
-                      IconButton(
-                        onPressed: () {
-                          // Lógica para editar la cuenta
-                        },
-                        icon: const Icon(Icons.arrow_forward_rounded),
+                      borderRadius: const BorderRadius.all(Radius.circular(12))
+                    ),
+                    child: ListTile(
+                      leading: Icon(
+                        Icons.logout_rounded,
+                        color: Theme.of(context).colorScheme.primary,
                       ),
-                    ],
-                  ),
-                ),
-                Center(
-                  child: ElevatedButton(
-                    onPressed: () => _signOut(context),
-                    child: const Text('Cerrar sesión'),
+                      title: Text("Cerrar Sesión"),
+                      onTap: () => _signOut(context),
+                    )
+                
                   ),
                 ),
               ],

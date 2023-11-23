@@ -8,6 +8,7 @@ import 'package:provider/provider.dart';
 import 'home_screen.dart';
 import 'firebase_options.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'color_schemes.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -26,9 +27,12 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      theme: ThemeData(useMaterial3: true, colorSchemeSeed: Colors.deepPurple),
+      theme: ThemeData(
+        useMaterial3: true,
+        colorScheme: lightColorScheme
+      ),
       darkTheme:
-          ThemeData(useMaterial3: true, colorSchemeSeed: Colors.deepPurple),
+          ThemeData(useMaterial3: true, colorScheme: darkColorScheme),
       home: const AuthenticationWrapper(),
     );
   }

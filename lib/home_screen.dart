@@ -80,79 +80,82 @@ class _HomeScreenState extends State<HomeScreen> {
       // content = PropertyList(query: savedQuery);
     }
 return Scaffold(
-  body: Padding(
-    padding: const EdgeInsets.only(top: 8.0, left: 8.0, right: 8.0),
-    child: Column(
-      children: [
-        TextField(
-          controller: searchController,
-          decoration: const InputDecoration(
-            prefixIcon: Icon(Icons.search),
-            hintText: 'Pensión de estudiantes',
-            border: OutlineInputBorder(),
-          ),
-          onSubmitted: _onSearchSubmitted,
+  backgroundColor: Theme.of(context).colorScheme.surface,
+  body: Column(
+    children: [
+      Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: SearchAnchor(
+          builder: (BuildContext context, SearchController searchController) {
+          return SearchBar(
+                padding: const MaterialStatePropertyAll<EdgeInsets>(EdgeInsets.symmetric(horizontal: 16)),
+                leading: const Icon(Icons.search),
+                hintText: ("Buscar viviendas"),
+                controller: searchController,
+                onSubmitted: _onSearchSubmitted,
+                onTap: () {
+                    searchController.openView();
+                  },
+                onChanged: (_) {
+                      searchController.openView();
+                  },
+              );
+            },
+          suggestionsBuilder: (BuildContext context, SearchController searchController) {
+            return List<ListTile>.generate(5, (int index) {
+                final String item = 'item $index';
+                return ListTile(
+                  title: Text(item),
+                  onTap: () {
+                    setState(() {
+                      searchController.closeView(item);
+                    });
+                  },
+                );
+              });
+          },
         ),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Expanded(
-              child: ElevatedButton(
-                onPressed: () {
-                  setState(() {
-                    showPensiones = !showPensiones;
-                  });
-                },
-                style: ElevatedButton.styleFrom(
-                  primary: showPensiones ? Colors.blue : Colors.grey,
-                ),
-                child: FittedBox(
-                  child: const Text('Pensiones'),
-                  fit: BoxFit.scaleDown,
-                ),
-              ),
+      ),
+
+      Wrap(
+        spacing: 10 ,
+        children: [
+            FilterChip(
+              showCheckmark: false,
+              label: const Text("Pensiones"),
+              selected: showPensiones ,
+              onSelected: (bool selected) {
+                setState(() {
+                  showPensiones = !showPensiones;
+                });
+              },
             ),
-            SizedBox(width: 8),
-            Expanded(
-              child: ElevatedButton(
-                onPressed: () {
-                  setState(() {
-                    showRoomies = !showRoomies;
-                  });
-                },
-                style: ElevatedButton.styleFrom(
-                  primary: showRoomies ? Colors.blue : Colors.grey,
-                ),
-                child: FittedBox(
-                  child: const Text('Roomies'),
-                  fit: BoxFit.scaleDown,
-                ),
-              ),
+            FilterChip(
+              showCheckmark: false,
+              label: const Text("Roomies"),
+              selected: showRoomies ,
+              onSelected: (bool selected) {
+                setState(() {
+                  showRoomies = !showRoomies;
+                });
+              },
             ),
-            SizedBox(width: 8),
-            Expanded(
-              child: ElevatedButton(
-                onPressed: () {
-                  setState(() {
-                    showArriendos = !showArriendos;
-                  });
-                },
-                style: ElevatedButton.styleFrom(
-                  primary: showArriendos ? Colors.blue : Colors.grey,
-                ),
-                child: FittedBox(
-                  child: const Text('Dptos'),
-                  fit: BoxFit.scaleDown,
-                ),
-              ),
+            FilterChip(
+              showCheckmark: false,
+              label: const Text("Departamentos"),
+              selected: showArriendos ,
+              onSelected: (bool selected) {
+                setState(() {
+                  showArriendos = !showArriendos;
+                });
+              },
             ),
           ],
         ),
-        Expanded(
-          child: content,
-        ),
-      ],
-    ),
+      Expanded(
+        child: content,
+      ),
+    ],
   ),
 );
 
@@ -181,23 +184,25 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('DormFinder'),
+        title:  Center(child:  Text('DormFinder' ,
+        style: TextStyle(color: Theme.of(context).colorScheme.onSurface ),)),
       ),
       body: _pages[currentPageIndex],
       bottomNavigationBar: NavigationBar(
-        height: 80,
+        backgroundColor: Theme.of(context).colorScheme.surface,
+        indicatorColor: Theme.of(context).colorScheme.secondaryContainer,
         onDestinationSelected: (int index) {
           setState(() {
             currentPageIndex = index;
           });
         },
         selectedIndex: currentPageIndex,
-        destinations: const <Widget>[
+        destinations:  <Widget>[
           NavigationDestination(
-              icon: Icon(Icons.home_rounded), label: 'Inicio'),
-          NavigationDestination(icon: Icon(Icons.person), label: 'Perfil'),
+              icon: Icon(Icons.home_rounded, color:  Theme.of(context).colorScheme.onSecondaryContainer,), label: 'Inicio'),
+          NavigationDestination(icon: Icon(Icons.person, color:  Theme.of(context).colorScheme.onSecondaryContainer,), label: 'Perfil'),
           NavigationDestination(
-              icon: FaIcon(FontAwesomeIcons.heart), label: 'Guardados'),
+              icon: FaIcon(FontAwesomeIcons.heart, color:  Theme.of(context).colorScheme.onSecondaryContainer,), label: 'Guardados'),
         ],
       ),
     );

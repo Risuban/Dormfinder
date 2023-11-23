@@ -530,7 +530,7 @@ class Departamento extends Property {
               userModel.savedProperties.contains(propertyReference)
                   ? Icons.favorite
                   : Icons.favorite_border,
-              color: Colors.red,
+              color: Theme.of(context).colorScheme.primary,
             ),
             onPressed: () {
               // Llama al método y proporciona el BuildContext
@@ -629,83 +629,92 @@ class PropertyList extends StatelessWidget {
                   ),
                 );
               },
-              child: Card(
-                margin: const EdgeInsets.all(8.0),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8.0),
-                ),
-                elevation: 4,
-                child: Column(
-                  children: [
-                    ClipRRect(
-                      borderRadius: const BorderRadius.only(
-                        topLeft: Radius.circular(8.0),
-                        topRight: Radius.circular(8.0),
-                      ),
-                      child: FadeInImage(
-                        placeholder: const NetworkImage(
-                          'https://upload.wikimedia.org/wikipedia/commons/thumb/3/3f/Placeholder_view_vector.svg/310px-Placeholder_view_vector.svg.png',
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                child: Card(
+                  color: Theme.of(context).colorScheme.surface,
+                  margin: const EdgeInsets.all(8.0),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8.0),
+                  ),
+                  elevation: 4,
+                  child: Column(
+                    children: [
+                      ClipRRect(
+                        borderRadius: const BorderRadius.only(
+                          topLeft: Radius.circular(8.0),
+                          topRight: Radius.circular(8.0),
                         ),
-                        image: property.image.isNotEmpty
-                            ? NetworkImage(property.image)
-                            : const NetworkImage(
-                                'https://upload.wikimedia.org/wikipedia/commons/thumb/3/3f/Placeholder_view_vector.svg/310px-Placeholder_view_vector.svg.png',
-                              ),
-                        width: double.infinity,
-                        height: 150.0,
-                        fit: BoxFit.cover,
+                        child: FadeInImage(
+                          placeholder: const NetworkImage(
+                            'https://upload.wikimedia.org/wikipedia/commons/thumb/3/3f/Placeholder_view_vector.svg/310px-Placeholder_view_vector.svg.png',
+                          ),
+                          image: property.image.isNotEmpty
+                              ? NetworkImage(property.image)
+                              : const NetworkImage(
+                                  'https://upload.wikimedia.org/wikipedia/commons/thumb/3/3f/Placeholder_view_vector.svg/310px-Placeholder_view_vector.svg.png',
+                                ),
+                          width: double.infinity,
+                          height: 150.0,
+                          fit: BoxFit.cover,
+                        ),
                       ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: ListTile(
-                        title: Text(
-                          property.name,
-                          style: const TextStyle(
-                            fontSize: 16.0,
-                            fontWeight: FontWeight.bold,
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: ListTile(
+                          title: Text(
+                            property.name,
+                            style:  TextStyle(
+                              fontSize: 16.0,
+                              fontWeight: FontWeight.bold,
+                              color: Theme.of(context).colorScheme.onSurface,
+                            ),
+                          ),
+                          subtitle: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    'A ${property.distance['time']} de ${property.distance['university']}',
+                                    style:  TextStyle(
+                                      color: Theme.of(context).colorScheme.onSurface,
+                                      fontSize: 14.0,
+                                    ),
+                                  ),
+                                  Text(
+                                    '\$${property.price.toStringAsFixed(0)}',
+                                    style: TextStyle(
+                                      color: Theme.of(context).colorScheme.onSurface,
+                                      fontSize: 16.0,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              IconButton(
+                                tooltip: "Agregar a favoritos",
+                                icon: Icon(
+                                  userModel.savedProperties
+                                          .contains(property.propertyReference)
+                                      ? Icons.favorite
+                                      : Icons.favorite_border,
+                                  color:  userModel.savedProperties
+                                          .contains(property.propertyReference) ?  Theme.of(context).colorScheme.primary : Theme.of(context).colorScheme.onSurfaceVariant ,
+                                ),
+                                onPressed: () {
+                                  // Asegúrate de pasar 'propertyReference' a 'toggleFavorite'
+                                  userModel.toggleFavorite(
+                                      context, property.propertyReference);
+                                },
+                              ),
+                            ],
                           ),
                         ),
-                        subtitle: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  'A ${property.distance['time']} de ${property.distance['university']}',
-                                  style: const TextStyle(
-                                    fontSize: 14.0,
-                                  ),
-                                ),
-                                Text(
-                                  '\$${property.price.toStringAsFixed(0)}',
-                                  style: const TextStyle(
-                                    fontSize: 16.0,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                              ],
-                            ),
-                            IconButton(
-                              icon: Icon(
-                                userModel.savedProperties
-                                        .contains(property.propertyReference)
-                                    ? Icons.favorite
-                                    : Icons.favorite_border,
-                                color: Colors.red,
-                              ),
-                              onPressed: () {
-                                // Asegúrate de pasar 'propertyReference' a 'toggleFavorite'
-                                userModel.toggleFavorite(
-                                    context, property.propertyReference);
-                              },
-                            ),
-                          ],
-                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
             );
@@ -731,6 +740,7 @@ class PropertyDetailsScreen extends StatelessWidget {
         child: property.buildDetailWidget(context),
       ),
       bottomNavigationBar: BottomAppBar(
+        color: Theme.of(context).colorScheme.surface ,
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
