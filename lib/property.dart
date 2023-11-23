@@ -942,6 +942,119 @@ Query buildPropertyQuery({
   return query;
 }
 
+// PropertyCard widget definition
+class PropertyCard extends StatelessWidget {
+  final Property property;
+
+  const PropertyCard({Key? key, required this.property}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    UserModel userModel = Provider.of<UserModel>(context);
+
+    return GestureDetector(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => PropertyDetailsScreen(property: property),
+          ),
+        );
+      },
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 8.0),
+        child: Card(
+          color: Theme.of(context).colorScheme.surface,
+          margin: const EdgeInsets.all(8.0),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(8.0),
+          ),
+          elevation: 4,
+          child: Column(
+            children: [
+              ClipRRect(
+                borderRadius: const BorderRadius.only(
+                  topLeft: Radius.circular(8.0),
+                  topRight: Radius.circular(8.0),
+                ),
+                child: FadeInImage(
+                  placeholder: const NetworkImage(
+                    'https://upload.wikimedia.org/wikipedia/commons/thumb/3/3f/Placeholder_view_vector.svg/310px-Placeholder_view_vector.svg.png',
+                  ),
+                  image: property.image.isNotEmpty
+                      ? NetworkImage(property.image)
+                      : const NetworkImage(
+                          'https://upload.wikimedia.org/wikipedia/commons/thumb/3/3f/Placeholder_view_vector.svg/310px-Placeholder_view_vector.svg.png',
+                        ),
+                  width: double.infinity,
+                  height: 150.0,
+                  fit: BoxFit.cover,
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: ListTile(
+                  title: Text(
+                    property.name,
+                    style: TextStyle(
+                      fontSize: 16.0,
+                      fontWeight: FontWeight.bold,
+                      color: Theme.of(context).colorScheme.onSurface,
+                    ),
+                  ),
+                  subtitle: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'A ${property.distance['time']} de ${property.distance['university']}',
+                            style: TextStyle(
+                              color: Theme.of(context).colorScheme.onSurface,
+                              fontSize: 14.0,
+                            ),
+                          ),
+                          Text(
+                            '\$${property.price.toStringAsFixed(0)}',
+                            style: TextStyle(
+                              color: Theme.of(context).colorScheme.onSurface,
+                              fontSize: 16.0,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
+                      ),
+                      IconButton(
+                        tooltip: "Agregar a favoritos",
+                        icon: Icon(
+                          userModel.savedProperties
+                                  .contains(property.propertyReference)
+                              ? Icons.favorite
+                              : Icons.favorite_border,
+                          color: userModel.savedProperties
+                                  .contains(property.propertyReference)
+                              ? Theme.of(context).colorScheme.primary
+                              : Theme.of(context).colorScheme.onSurfaceVariant,
+                        ),
+                        onPressed: () {
+                          userModel.toggleFavorite(
+                              context, property.propertyReference);
+                        },
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+// Modified PropertyList widget
 class PropertyList extends StatelessWidget {
   final Query query;
 
@@ -950,7 +1063,6 @@ class PropertyList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     UserModel userModel = Provider.of<UserModel>(context);
-    // Utiliza una clave única para el ListView.builder
     GlobalKey<AnimatedListState> listKey = GlobalKey<AnimatedListState>();
 
     return StreamBuilder(
@@ -980,117 +1092,11 @@ class PropertyList extends StatelessWidget {
         }).toList();
 
         return ListView.builder(
-          key: listKey, // Asigna la clave única al ListView.builder
+          key: listKey,
           itemCount: properties.length,
           itemBuilder: (context, index) {
             final property = properties[index];
-            return GestureDetector(
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) =>
-                        PropertyDetailsScreen(property: property),
-                  ),
-                );
-              },
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                child: Card(
-                  color: Theme.of(context).colorScheme.surface,
-                  margin: const EdgeInsets.all(8.0),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8.0),
-                  ),
-                  elevation: 4,
-                  child: Column(
-                    children: [
-                      ClipRRect(
-                        borderRadius: const BorderRadius.only(
-                          topLeft: Radius.circular(8.0),
-                          topRight: Radius.circular(8.0),
-                        ),
-                        child: FadeInImage(
-                          placeholder: const NetworkImage(
-                            'https://upload.wikimedia.org/wikipedia/commons/thumb/3/3f/Placeholder_view_vector.svg/310px-Placeholder_view_vector.svg.png',
-                          ),
-                          image: property.image.isNotEmpty
-                              ? NetworkImage(property.image)
-                              : const NetworkImage(
-                                  'https://upload.wikimedia.org/wikipedia/commons/thumb/3/3f/Placeholder_view_vector.svg/310px-Placeholder_view_vector.svg.png',
-                                ),
-                          width: double.infinity,
-                          height: 150.0,
-                          fit: BoxFit.cover,
-                        ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: ListTile(
-                          title: Text(
-                            property.name,
-                            style: TextStyle(
-                              fontSize: 16.0,
-                              fontWeight: FontWeight.bold,
-                              color: Theme.of(context).colorScheme.onSurface,
-                            ),
-                          ),
-                          subtitle: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    'A ${property.distance['time']} de ${property.distance['university']}',
-                                    style: TextStyle(
-                                      color: Theme.of(context)
-                                          .colorScheme
-                                          .onSurface,
-                                      fontSize: 14.0,
-                                    ),
-                                  ),
-                                  Text(
-                                    '\$${property.price.toStringAsFixed(0)}',
-                                    style: TextStyle(
-                                      color: Theme.of(context)
-                                          .colorScheme
-                                          .onSurface,
-                                      fontSize: 16.0,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              IconButton(
-                                tooltip: "Agregar a favoritos",
-                                icon: Icon(
-                                  userModel.savedProperties
-                                          .contains(property.propertyReference)
-                                      ? Icons.favorite
-                                      : Icons.favorite_border,
-                                  color: userModel.savedProperties
-                                          .contains(property.propertyReference)
-                                      ? Theme.of(context).colorScheme.primary
-                                      : Theme.of(context)
-                                          .colorScheme
-                                          .onSurfaceVariant,
-                                ),
-                                onPressed: () {
-                                  // Asegúrate de pasar 'propertyReference' a 'toggleFavorite'
-                                  userModel.toggleFavorite(
-                                      context, property.propertyReference);
-                                },
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            );
+            return PropertyCard(property: property);
           },
         );
       },

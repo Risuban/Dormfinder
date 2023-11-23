@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter_application_1/saved_screen.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'profile_screen.dart';
@@ -50,6 +51,8 @@ class _HomeScreenState extends State<HomeScreen> {
   final TextEditingController searchController = TextEditingController();
   int currentPageIndex = 0;
 
+  List<Property> properties = [];
+
   void _onSearchSubmitted(String searchText) {
     setState(() {
       searchController.text = searchText;
@@ -57,108 +60,136 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    Widget content;
+  void initState() {
+    super.initState();
+    // Initialize the properties list or perform any other setup if needed
+    properties = [];
 
-    // Por defecto, establecemos el contenido de la página de inicio
-    Query homeQuery = buildHomeQuery(
+    // Use a StreamBuilder to listen for changes in the Firestore data
+    // and update the properties list accordingly
+    buildHomeQuery(
       showPensiones: showPensiones,
       showRoomies: showRoomies,
       showArriendos: showArriendos,
       searchText: searchController.text,
-    );
-    content = PropertyList(query: homeQuery);
+    ).snapshots().listen((snapshot) {
+      if (snapshot.docs.isNotEmpty) {
+        setState(() {
+          properties = snapshot.docs.map((doc) {
+            Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
+            switch (data['type']) {
+              case 'roomie':
+                return Roomie.fromMap(data, doc.reference);
+              case 'pension':
+                return Pension.fromMap(data, doc.reference);
+              case 'departamento':
+                return Departamento.fromMap(data, doc.reference);
+              default:
+                return Property.fromMap(data, doc.reference);
+            }
+          }).toList();
+        });
+      }
+    });
+  }
 
-    // Cambia el contenido según el índice de la página actual
-    if (currentPageIndex == 1) {
-      content = const ProfileScreen();
-    } else if (currentPageIndex == 2) {
-      // // Aquí puedes definir el contenido para la página de guardados
-      // // Ejemplo (debes completar la lógica para obtener savedPropertyIds):
-      // List<String> savedPropertyIds = /* Obtén los IDs de las propiedades guardadas */;
-      // Query savedQuery = buildSavedQuery(savedPropertyIds);
-      // content = PropertyList(query: savedQuery);
-    }
-return Scaffold(
-  backgroundColor: Theme.of(context).colorScheme.surface,
-  body: Column(
-    children: [
-      Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: SearchAnchor(
-          builder: (BuildContext context, SearchController searchController) {
-          return SearchBar(
-                padding: const MaterialStatePropertyAll<EdgeInsets>(EdgeInsets.symmetric(horizontal: 16)),
-                leading: const Icon(Icons.search),
-                hintText: ("Buscar viviendas"),
-                controller: searchController,
-                onSubmitted: _onSearchSubmitted,
-                onTap: () {
-                    searchController.openView();
-                  },
-                onChanged: (_) {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: CustomScrollView(
+        slivers: [
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: SearchAnchor(
+                builder:
+                    (BuildContext context, SearchController searchController) {
+                  return SearchBar(
+                    padding: const MaterialStatePropertyAll<EdgeInsets>(
+                      EdgeInsets.symmetric(horizontal: 16),
+                    ),
+                    leading: const Icon(Icons.search),
+                    hintText: ("Buscar viviendas"),
+                    controller: searchController,
+                    onSubmitted: _onSearchSubmitted,
+                    onTap: () {
                       searchController.openView();
-                  },
-              );
-            },
-          suggestionsBuilder: (BuildContext context, SearchController searchController) {
-            return List<ListTile>.generate(5, (int index) {
-                final String item = 'item $index';
-                return ListTile(
-                  title: Text(item),
-                  onTap: () {
-                    setState(() {
-                      searchController.closeView(item);
-                    });
-                  },
-                );
-              });
-          },
-        ),
+                    },
+                    onChanged: (_) {
+                      searchController.openView();
+                    },
+                  );
+                },
+                suggestionsBuilder:
+                    (BuildContext context, SearchController searchController) {
+                  return List<ListTile>.generate(5, (int index) {
+                    final String item = 'item $index';
+                    return ListTile(
+                      title: Text(item),
+                      onTap: () {
+                        setState(() {
+                          searchController.closeView(item);
+                        });
+                      },
+                    );
+                  });
+                },
+              ),
+            ),
+          ),
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 8.0),
+              child: Wrap(
+                spacing: 10,
+                children: [
+                  FilterChip(
+                    showCheckmark: false,
+                    label: const Text("Pensiones"),
+                    selected: showPensiones,
+                    onSelected: (bool selected) {
+                      setState(() {
+                        showPensiones = !showPensiones;
+                      });
+                    },
+                  ),
+                  FilterChip(
+                    showCheckmark: false,
+                    label: const Text("Roomies"),
+                    selected: showRoomies,
+                    onSelected: (bool selected) {
+                      setState(() {
+                        showRoomies = !showRoomies;
+                      });
+                    },
+                  ),
+                  FilterChip(
+                    showCheckmark: false,
+                    label: const Text("Departamentos"),
+                    selected: showArriendos,
+                    onSelected: (bool selected) {
+                      setState(() {
+                        showArriendos = !showArriendos;
+                      });
+                    },
+                  ),
+                ],
+              ),
+            ),
+          ),
+          // SliverList is a direct child of CustomScrollView
+          SliverList(
+            delegate: SliverChildBuilderDelegate(
+              (BuildContext context, int index) {
+                // Use the PropertyCard widget here
+                return PropertyCard(property: properties[index]);
+              },
+              childCount: properties.length,
+            ),
+          ),
+        ],
       ),
-
-      Wrap(
-        spacing: 10 ,
-        children: [
-            FilterChip(
-              showCheckmark: false,
-              label: const Text("Pensiones"),
-              selected: showPensiones ,
-              onSelected: (bool selected) {
-                setState(() {
-                  showPensiones = !showPensiones;
-                });
-              },
-            ),
-            FilterChip(
-              showCheckmark: false,
-              label: const Text("Roomies"),
-              selected: showRoomies ,
-              onSelected: (bool selected) {
-                setState(() {
-                  showRoomies = !showRoomies;
-                });
-              },
-            ),
-            FilterChip(
-              showCheckmark: false,
-              label: const Text("Departamentos"),
-              selected: showArriendos ,
-              onSelected: (bool selected) {
-                setState(() {
-                  showArriendos = !showArriendos;
-                });
-              },
-            ),
-          ],
-        ),
-      Expanded(
-        child: content,
-      ),
-    ],
-  ),
-);
-
+    );
   }
 }
 
@@ -166,7 +197,6 @@ class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key});
 
   @override
-  // ignore: library_private_types_in_public_api
   _MyHomePageState createState() => _MyHomePageState();
 }
 
@@ -174,7 +204,6 @@ class _MyHomePageState extends State<MyHomePage> {
   int currentPageIndex = 0;
 
   final List<Widget> _pages = [
-    // ignore: prefer_const_constructors
     HomeScreen(),
     const ProfileScreen(),
     const SavedScreen(),
@@ -184,8 +213,12 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title:  Center(child:  Text('DormFinder' ,
-        style: TextStyle(color: Theme.of(context).colorScheme.onSurface ),)),
+        title: Center(
+          child: Text(
+            'DormFinder',
+            style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
+          ),
+        ),
       ),
       body: _pages[currentPageIndex],
       bottomNavigationBar: NavigationBar(
@@ -197,12 +230,28 @@ class _MyHomePageState extends State<MyHomePage> {
           });
         },
         selectedIndex: currentPageIndex,
-        destinations:  <Widget>[
+        destinations: <Widget>[
           NavigationDestination(
-              icon: Icon(Icons.home_rounded, color:  Theme.of(context).colorScheme.onSecondaryContainer,), label: 'Inicio'),
-          NavigationDestination(icon: Icon(Icons.person, color:  Theme.of(context).colorScheme.onSecondaryContainer,), label: 'Perfil'),
+            icon: Icon(
+              Icons.home_rounded,
+              color: Theme.of(context).colorScheme.onSecondaryContainer,
+            ),
+            label: 'Inicio',
+          ),
           NavigationDestination(
-              icon: FaIcon(FontAwesomeIcons.heart, color:  Theme.of(context).colorScheme.onSecondaryContainer,), label: 'Guardados'),
+            icon: Icon(
+              Icons.person,
+              color: Theme.of(context).colorScheme.onSecondaryContainer,
+            ),
+            label: 'Perfil',
+          ),
+          NavigationDestination(
+            icon: FaIcon(
+              FontAwesomeIcons.heart,
+              color: Theme.of(context).colorScheme.onSecondaryContainer,
+            ),
+            label: 'Guardados',
+          ),
         ],
       ),
     );
