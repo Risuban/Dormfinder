@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-
+import 'package:url_launcher/url_launcher.dart';
 class Property {
   final String name;
   final String image;
@@ -149,15 +149,7 @@ class Roomie extends Property {
                   const TextStyle(fontSize: 25.0, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 10),
-            // Sección de Precio
-            Text(
-              'Precio: \$${price.toStringAsFixed(0)}',
-              style: const TextStyle(fontSize: 18),
-            ),
-            const SizedBox(height: 10),
 
-            // Divisor
-            const Divider(),
 
             // Sección de Descripción
             Text(
@@ -306,13 +298,6 @@ class Pension extends Property {
           const SizedBox(height: 10),
 
           // Mostrar el precio
-          Text(
-            'Precio: \$${price.toStringAsFixed(0)}',
-            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-          ),
-          const SizedBox(height: 10),
-
-          const Divider(),
 
           // Mostrar las características de las habitaciones disponibles
           const Text(
@@ -450,13 +435,6 @@ class Departamento extends Property {
 
           const Divider(),
 
-          Text(
-            'Precio: \$${price.toStringAsFixed(0)}',
-            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-          ),
-          const SizedBox(height: 8),
-
-          const Divider(),
 
           Text(
             'Gastos comunes: \$${commonExpenses.toStringAsFixed(0)}',
@@ -684,6 +662,43 @@ class PropertyDetailsScreen extends StatelessWidget {
       body: SingleChildScrollView(
         child: property.buildDetailWidget(),
       ),
+      bottomNavigationBar: BottomAppBar(
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Padding(
+              padding: EdgeInsets.all(16.0),
+              child: Text('Precio: \$${property.price}',
+               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),),
+            ),
+            Padding(
+              padding: EdgeInsets.only(right: 16.0),
+              child: ElevatedButton(
+                onPressed: () => _contactOwner(property.owner),
+                style: ElevatedButton.styleFrom(
+                  primary: Theme.of(context).primaryColor, // Color primario oscuro
+                ),
+                child: Text(
+                  'Contactar',
+                  style: TextStyle(color: Colors.white, fontSize: 15),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
     );
+  }
+
+  void _contactOwner(DocumentReference ownerReference) async {
+    try {
+      final ownerDoc = await ownerReference.get();
+      final data = ownerDoc.data() as Map<String, dynamic>?;
+      final phoneNumber = data?['phone'] as String?;
+      final Uri phoneUri = Uri.parse('tel:$phoneNumber');
+      launchUrl(phoneUri);
+    } catch (e) {
+      // Manejar cualquier error que pueda ocurrir durante la obtención del documento o el lanzamiento
+    }
   }
 }

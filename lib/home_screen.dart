@@ -79,66 +79,83 @@ class _HomeScreenState extends State<HomeScreen> {
       // Query savedQuery = buildSavedQuery(savedPropertyIds);
       // content = PropertyList(query: savedQuery);
     }
-    return Scaffold(
-      body: Padding(
-        padding: const EdgeInsets.only(top: 8.0, left: 8.0, right: 8.0),
-        child: Column(
+return Scaffold(
+  body: Padding(
+    padding: const EdgeInsets.only(top: 8.0, left: 8.0, right: 8.0),
+    child: Column(
+      children: [
+        TextField(
+          controller: searchController,
+          decoration: const InputDecoration(
+            prefixIcon: Icon(Icons.search),
+            hintText: 'Pensión de estudiantes',
+            border: OutlineInputBorder(),
+          ),
+          onSubmitted: _onSearchSubmitted,
+        ),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            TextField(
-              controller: searchController,
-              decoration: const InputDecoration(
-                prefixIcon: Icon(Icons.search),
-                hintText: 'Pensión de estudiantes',
-                border: OutlineInputBorder(),
-              ),
-              onSubmitted:
-                  _onSearchSubmitted, // Se llama cuando se presiona Enter
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                ElevatedButton(
-                  onPressed: () {
-                    setState(() {
-                      showPensiones = !showPensiones;
-                    });
-                  },
-                  style: ElevatedButton.styleFrom(
-                    primary: showPensiones ? Colors.blue : Colors.grey,
-                  ),
-                  child: const Text('Pensiones'),
-                ),
-                ElevatedButton(
-                  onPressed: () {
-                    setState(() {
-                      showRoomies = !showRoomies;
-                    });
-                  },
-                  style: ElevatedButton.styleFrom(
-                    primary: showRoomies ? Colors.blue : Colors.grey,
-                  ),
-                  child: const Text('Roomies'),
-                ),
-                ElevatedButton(
-                  onPressed: () {
-                    setState(() {
-                      showArriendos = !showArriendos;
-                    });
-                  },
-                  style: ElevatedButton.styleFrom(
-                    primary: showArriendos ? Colors.blue : Colors.grey,
-                  ),
-                  child: const Text('Dptos'),
-                ),
-              ],
-            ),
             Expanded(
-              child: content,
+              child: ElevatedButton(
+                onPressed: () {
+                  setState(() {
+                    showPensiones = !showPensiones;
+                  });
+                },
+                style: ElevatedButton.styleFrom(
+                  primary: showPensiones ? Colors.blue : Colors.grey,
+                ),
+                child: FittedBox(
+                  child: const Text('Pensiones'),
+                  fit: BoxFit.scaleDown,
+                ),
+              ),
+            ),
+            SizedBox(width: 8),
+            Expanded(
+              child: ElevatedButton(
+                onPressed: () {
+                  setState(() {
+                    showRoomies = !showRoomies;
+                  });
+                },
+                style: ElevatedButton.styleFrom(
+                  primary: showRoomies ? Colors.blue : Colors.grey,
+                ),
+                child: FittedBox(
+                  child: const Text('Roomies'),
+                  fit: BoxFit.scaleDown,
+                ),
+              ),
+            ),
+            SizedBox(width: 8),
+            Expanded(
+              child: ElevatedButton(
+                onPressed: () {
+                  setState(() {
+                    showArriendos = !showArriendos;
+                  });
+                },
+                style: ElevatedButton.styleFrom(
+                  primary: showArriendos ? Colors.blue : Colors.grey,
+                ),
+                child: FittedBox(
+                  child: const Text('Dptos'),
+                  fit: BoxFit.scaleDown,
+                ),
+              ),
             ),
           ],
         ),
-      ),
-    );
+        Expanded(
+          child: content,
+        ),
+      ],
+    ),
+  ),
+);
+
   }
 }
 
