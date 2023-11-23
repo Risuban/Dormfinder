@@ -7,7 +7,7 @@ import 'package:flutter_application_1/property.dart';
 import 'package:provider/provider.dart';
 
 class SavedScreen extends StatelessWidget {
-  const SavedScreen({Key? key});
+  const SavedScreen({super.key});
 
   @override
   Widget build(BuildContext context) {

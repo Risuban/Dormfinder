@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 import 'package:flutter_application_1/saved_screen.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'profile_screen.dart';
@@ -218,6 +217,7 @@ class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key});
 
   @override
+  // ignore: library_private_types_in_public_api
   _MyHomePageState createState() => _MyHomePageState();
 }
 
@@ -225,7 +225,7 @@ class _MyHomePageState extends State<MyHomePage> {
   int currentPageIndex = 0;
 
   final List<Widget> _pages = [
-    HomeScreen(),
+    const HomeScreen(),
     const ProfileScreen(),
     const SavedScreen(),
   ];

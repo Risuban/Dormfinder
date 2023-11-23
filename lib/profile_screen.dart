@@ -98,7 +98,7 @@ class ProfileScreen extends StatelessWidget {
                         Icons.logout_rounded,
                         color: Theme.of(context).colorScheme.primary,
                       ),
-                      title: Text("Cerrar Sesión"),
+                      title: const Text("Cerrar Sesión"),
                       onTap: () => _signOut(context),
                     )
                 
