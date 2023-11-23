@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter_application_1/main.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -925,20 +924,13 @@ Query buildPropertyQuery({
     query = query.where('type', whereIn: types);
   }
 
+  // check if search text is not empty, if so, filter by name
   if (searchText.isNotEmpty) {
-    // Implementa la lógica de búsqueda de subcadenas aquí
-    String searchLower = searchText.toLowerCase();
-    String searchUpper = searchText.toLowerCase().replaceRange(
-          searchText.length - 1,
-          searchText.length,
-          String.fromCharCode(searchText.codeUnitAt(searchText.length - 1) + 1),
-        );
-
-    query = query
-        .where('name', isGreaterThanOrEqualTo: searchLower)
-        .where('name', isLessThan: searchUpper);
+    query = FirebaseFirestore.instance
+        .collection('properties')
+        .orderBy('name')
+        .startAt([searchText]).endAt(['$searchText\uf8ff']);
   }
-
   return query;
 }
 
@@ -1062,7 +1054,6 @@ class PropertyList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    UserModel userModel = Provider.of<UserModel>(context);
     GlobalKey<AnimatedListState> listKey = GlobalKey<AnimatedListState>();
 
     return StreamBuilder(

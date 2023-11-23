@@ -52,10 +52,17 @@ class _HomeScreenState extends State<HomeScreen> {
   int currentPageIndex = 0;
 
   List<Property> properties = [];
+  List<String> searchHistory = [];
 
   void _onSearchSubmitted(String searchText) {
     setState(() {
       searchController.text = searchText;
+      _updateQuery();
+
+      // Update search history
+      if (!searchHistory.contains(searchText)) {
+        searchHistory.add(searchText);
+      }
     });
   }
 
@@ -65,9 +72,16 @@ class _HomeScreenState extends State<HomeScreen> {
     // Initialize the properties list or perform any other setup if needed
     properties = [];
 
-    // Use a StreamBuilder to listen for changes in the Firestore data
-    // and update the properties list accordingly
-    buildHomeQuery(
+    _updateQuery();
+  }
+
+  void _updateQuery() {
+    // Update the query whenever filter values change
+    setState(() {
+      properties = []; // clear the existing properties
+    });
+
+    buildPropertyQuery(
       showPensiones: showPensiones,
       showRoomies: showRoomies,
       showArriendos: showArriendos,
@@ -76,7 +90,9 @@ class _HomeScreenState extends State<HomeScreen> {
       if (snapshot.docs.isNotEmpty) {
         setState(() {
           properties = snapshot.docs.map((doc) {
+            // Adjust the mapping logic based on your data model
             Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
+
             switch (data['type']) {
               case 'roomie':
                 return Roomie.fromMap(data, doc.reference);
@@ -102,6 +118,15 @@ class _HomeScreenState extends State<HomeScreen> {
             child: Padding(
               padding: const EdgeInsets.all(8.0),
               child: SearchAnchor(
+                viewTrailing: [
+                  // add a search icon
+                  IconButton(
+                    icon: const Icon(Icons.search),
+                    onPressed: () {
+                      searchController.clear();
+                    },
+                  ),
+                ],
                 builder:
                     (BuildContext context, SearchController searchController) {
                   return SearchBar(
@@ -112,27 +137,20 @@ class _HomeScreenState extends State<HomeScreen> {
                     hintText: ("Buscar viviendas"),
                     controller: searchController,
                     onSubmitted: _onSearchSubmitted,
-                    onTap: () {
-                      searchController.openView();
-                    },
-                    onChanged: (_) {
-                      searchController.openView();
-                    },
                   );
                 },
                 suggestionsBuilder:
                     (BuildContext context, SearchController searchController) {
-                  return List<ListTile>.generate(5, (int index) {
-                    final String item = 'item $index';
+                  return searchHistory.map((String suggestion) {
                     return ListTile(
-                      title: Text(item),
+                      title: Text(suggestion),
                       onTap: () {
                         setState(() {
-                          searchController.closeView(item);
+                          searchController.closeView(suggestion);
                         });
                       },
                     );
-                  });
+                  }).toList();
                 },
               ),
             ),
@@ -151,6 +169,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       setState(() {
                         showPensiones = !showPensiones;
                       });
+                      _updateQuery();
                     },
                   ),
                   FilterChip(
@@ -161,6 +180,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       setState(() {
                         showRoomies = !showRoomies;
                       });
+                      _updateQuery();
                     },
                   ),
                   FilterChip(
@@ -171,6 +191,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       setState(() {
                         showArriendos = !showArriendos;
                       });
+                      _updateQuery();
                     },
                   ),
                 ],
