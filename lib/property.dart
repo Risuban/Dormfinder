@@ -1115,34 +1115,12 @@ class PropertyDetailsScreen extends StatelessWidget {
       body: SingleChildScrollView(
         child: property.buildDetailWidget(context),
       ),
-      bottomNavigationBar: BottomAppBar(
-        color: Theme.of(context).colorScheme.surface,
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Padding(
-              padding: EdgeInsets.all(16.0),
-              child: Text(
-                'Precio: \$${property.price}',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-              ),
-            ),
-            Padding(
-              padding: EdgeInsets.only(right: 16.0),
-              child: ElevatedButton(
-                onPressed: () => _contactOwner(property.owner),
-                style: ElevatedButton.styleFrom(
-                  primary:
-                      Theme.of(context).primaryColor, // Color primario oscuro
-                ),
-                child: Text(
-                  'Contactar',
-                  style: TextStyle(color: Colors.white, fontSize: 15),
-                ),
-              ),
-            ),
-          ],
-        ),
+      floatingActionButton: FloatingActionButton.extended(
+        label: const Text("Llamar"),
+        tooltip: "Contactarse con Arrendatario",
+        foregroundColor: Theme.of(context).colorScheme.primary,
+        onPressed: () => _contactOwner(property.owner),
+        icon: const Icon(Icons.phone),
       ),
     );
   }
