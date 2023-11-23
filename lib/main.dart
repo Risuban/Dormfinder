@@ -54,6 +54,7 @@ class AuthenticationWrapper extends StatelessWidget {
 }
 
 class UserModel extends ChangeNotifier {
+  final String _userId = FirebaseAuth.instance.currentUser!.uid;
   String _email = '';
   String _userName = '';
   String _phoneNumber = '';
@@ -87,6 +88,59 @@ class UserModel extends ChangeNotifier {
       print('User signed in successfully!');
     } catch (e) {
       print('Error updating user info from Firestore: $e');
+    }
+  }
+
+  void toggleFavorite(BuildContext context, DocumentReference owner) {
+    // Usa 'context' según sea necesario
+
+    // Verificar si la propiedad está en favoritos
+    if (savedProperties.contains(owner)) {
+      // Si está en favoritos, quitarla de la lista
+      removeFromFavorites(owner);
+    } else {
+      // Si no está en favoritos, agregarla a la lista
+      addToFavorites(owner);
+    }
+  }
+
+  Future<void> addToFavorites(DocumentReference propertyReference) async {
+    try {
+      // Añadir la referencia de la propiedad a la lista de propiedades guardadas
+      _savedProperties.add(propertyReference);
+
+      // Actualizar la base de datos
+      await FirebaseFirestore.instance
+          .collection('users')
+          .doc(
+              _userId) // Asegúrate de tener el ID del usuario almacenado en _userId
+          .update({'saved_properties': _savedProperties});
+
+      // Notificar a los listeners que los datos han cambiado
+      notifyListeners();
+    } catch (e) {
+      print('Error adding property to favorites: $e');
+    }
+  }
+
+  Future<void> removeFromFavorites(DocumentReference property) async {
+    try {
+      // Verificar si la propiedad está en la lista de favoritos
+      if (_savedProperties.contains(property)) {
+        // Quitar la propiedad de la lista
+        _savedProperties.remove(property);
+
+        // Actualizar la base de datos con la nueva lista de favoritos
+        await FirebaseFirestore.instance
+            .collection('users')
+            .doc(_userId)
+            .update({'saved_properties': _savedProperties});
+
+        // Notificar a los oyentes del cambio
+        notifyListeners();
+      }
+    } catch (e) {
+      print('Error removing property from favorites: $e');
     }
   }
 }

@@ -7,7 +7,7 @@ import 'package:flutter_application_1/property.dart';
 import 'package:provider/provider.dart';
 
 class SavedScreen extends StatelessWidget {
-  const SavedScreen({super.key});
+  const SavedScreen({Key? key});
 
   @override
   Widget build(BuildContext context) {
@@ -18,10 +18,26 @@ class SavedScreen extends StatelessWidget {
     List<DocumentReference> savedPropertyReferences = userModel.savedProperties;
     print(savedPropertyReferences);
 
+    // Si no hay propiedades guardadas, mostrar un mensaje en el centro de la pantalla
+    if (savedPropertyReferences.isEmpty) {
+      return const Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              'Aún no has guardado propiedades.',
+              style: TextStyle(fontSize: 18),
+            ),
+          ],
+        ),
+      );
+    }
+
     // Crear una consulta que obtenga los documentos correspondientes a las referencias guardadas
     Query query = FirebaseFirestore.instance.collection('properties').where(
-        FieldPath.documentId,
-        whereIn: savedPropertyReferences.map((ref) => ref.id));
+          FieldPath.documentId,
+          whereIn: savedPropertyReferences.map((ref) => ref.id),
+        );
 
     return PropertyList(query: query);
   }
