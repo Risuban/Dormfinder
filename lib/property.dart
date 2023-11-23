@@ -5,6 +5,7 @@ import 'package:flutter_application_1/main.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
+
 class Property {
   final String name;
   final String image;
@@ -160,7 +161,6 @@ class Roomie extends Property {
                   const TextStyle(fontSize: 25.0, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 10),
-
 
             // Sección de Descripción
             Text(
@@ -480,7 +480,6 @@ class Departamento extends Property {
 
           const Divider(),
 
-
           Text(
             'Gastos comunes: \$${commonExpenses.toStringAsFixed(0)}',
             style: const TextStyle(fontSize: 18),
@@ -581,10 +580,14 @@ Query buildPropertyQuery({
 class PropertyList extends StatelessWidget {
   final Query query;
 
-  const PropertyList({super.key, required this.query});
+  const PropertyList({Key? key, required this.query}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    UserModel userModel = Provider.of<UserModel>(context);
+    // Utiliza una clave única para el ListView.builder
+    GlobalKey<AnimatedListState> listKey = GlobalKey<AnimatedListState>();
+
     return StreamBuilder(
       stream: query.snapshots(),
       builder: (context, snapshot) {
@@ -612,6 +615,7 @@ class PropertyList extends StatelessWidget {
         }).toList();
 
         return ListView.builder(
+          key: listKey, // Asigna la clave única al ListView.builder
           itemCount: properties.length,
           itemBuilder: (context, index) {
             final property = properties[index];
@@ -658,25 +662,44 @@ class PropertyList extends StatelessWidget {
                         title: Text(
                           property.name,
                           style: const TextStyle(
-                            fontSize: 18.0,
+                            fontSize: 16.0,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
-                        subtitle: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
+                        subtitle: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Text(
-                              'Tiempo a la universidad: ${property.distance['time'] ?? 'No disponible'}',
-                              style: const TextStyle(
-                                fontSize: 14.0,
-                              ),
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'A ${property.distance['time']} de ${property.distance['university']}',
+                                  style: const TextStyle(
+                                    fontSize: 14.0,
+                                  ),
+                                ),
+                                Text(
+                                  '\$${property.price.toStringAsFixed(0)}',
+                                  style: const TextStyle(
+                                    fontSize: 16.0,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ],
                             ),
-                            Text(
-                              '\$${property.price.toStringAsFixed(0)}',
-                              style: const TextStyle(
-                                fontSize: 16.0,
-                                fontWeight: FontWeight.bold,
+                            IconButton(
+                              icon: Icon(
+                                userModel.savedProperties
+                                        .contains(property.propertyReference)
+                                    ? Icons.favorite
+                                    : Icons.favorite_border,
+                                color: Colors.red,
                               ),
+                              onPressed: () {
+                                // Asegúrate de pasar 'propertyReference' a 'toggleFavorite'
+                                userModel.toggleFavorite(
+                                    context, property.propertyReference);
+                              },
                             ),
                           ],
                         ),
@@ -713,15 +736,18 @@ class PropertyDetailsScreen extends StatelessWidget {
           children: [
             Padding(
               padding: EdgeInsets.all(16.0),
-              child: Text('Precio: \$${property.price}',
-               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),),
+              child: Text(
+                'Precio: \$${property.price}',
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
             ),
             Padding(
               padding: EdgeInsets.only(right: 16.0),
               child: ElevatedButton(
                 onPressed: () => _contactOwner(property.owner),
                 style: ElevatedButton.styleFrom(
-                  primary: Theme.of(context).primaryColor, // Color primario oscuro
+                  primary:
+                      Theme.of(context).primaryColor, // Color primario oscuro
                 ),
                 child: Text(
                   'Contactar',
