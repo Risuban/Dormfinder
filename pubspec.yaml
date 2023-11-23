@@ -8,9 +8,16 @@ environment:
 
 dependencies:
   firebase_core: ^2.17.0
+  firebase_auth: ^4.11.0
   flutter:
     sdk: flutter
   font_awesome_flutter: ^10.5.0
+  cloud_firestore: ^4.10.0
+  carousel_slider: ^4.2.1
+  google_maps_flutter: ^2.5.0
+  provider: ^6.1.1
+  url_launcher: ^6.0.12  
+
 
 dev_dependencies:
   flutter_test:
@@ -19,3 +26,5 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
+  assets:
+    - web/assets/yoshi_waton.jpg
